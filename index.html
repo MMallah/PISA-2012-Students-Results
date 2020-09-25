@@ -1,0 +1,824 @@
+Pisa 2012 Survey
+by Moustafa Elmallah
+Table of Contents
+Introduction
+Importing Data
+Data Wrangling
+Exploratory Data Analysis
+Why 1st place country has better scores ?
+Explanatory Data Analysis
+Conclusions
+
+
+Introduction
+What is the structure of your dataset?
+The data set has 485,490 rows, and 600+ columns
+
+What is/are the main feature(s) of interest in your dataset?
+We have selected PV1MATH, PV1READ, and PV1SCIE; these are the desired features to be invstigated and to observe relationships vs other selected features from the data set
+
+What features in the dataset do you think will help support your investigation into your feature(s) of interest?
+We will explore the following features :
+
+1st section
+time spent learning math, reading and science, time spent using computer, Gender, Class Size, score by country
+2nd section part a)
+Possessions - cellular phones, televisions, computers, How many books at home
+2nd section part b)
+Subjective Norms -Friends Do Well in Mathematics, Friends Work Hard on Mathematics, Friends Enjoy Mathematics Tests, Parents >Believe Studying Mathematics Is Important, Parents Believe Mathematics Is Important for Career, Parents Like Mathematics
+
+Importing Data
+# import all packages and set plots to be embedded inline
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from pandas_profiling import ProfileReport
+import plotly.graph_objects as go
+import pycountry
+
+
+%matplotlib inline
+sns.set_style('whitegrid')
+#import data
+path= "D:\\udacity\\Data Analyst Nano Degree\\Lesson 3\\Project\\communicate-data-project-template\\pisa2012.csv"
+raw_data = pd.read_csv(path, encoding = "ISO-8859-1");
+C:\Users\mostafa.elmallah\Anaconda3\lib\site-packages\IPython\core\interactiveshell.py:3071: DtypeWarning: Columns (15,16,17,21,22,23,24,25,26,30,31,36,37,45,65,123,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,475) have mixed types.Specify dtype option on import or set low_memory=False.
+  has_raised = await self.run_ast_nodes(code_ast.body, cell_name,
+# drop unnecessary column
+raw_data.drop('Unnamed: 0', axis=1,inplace=True)
+# load and change the column names from data dictionary file
+
+path2= "D:\\udacity\\Data Analyst Nano Degree\\Lesson 3\\Project\\communicate-data-project-template\\pisadict2012.csv"
+coloumn_dict= pd.read_csv(path2, encoding = "ISO-8859-1")
+raw_data.columns= coloumn_dict['x']
+# view al columns
+pd.options.display.max_columns = None
+raw_data.head()
+x	Country code 3-character	Adjudicated sub-region code 7-digit code (3-digit country code + region ID + stratum ID)	Stratum ID 7-character (cnt + region ID + original stratum ID)	OECD country	National Centre 6-digit Code	School ID 7-digit (region ID + stratum ID + 3-digit school ID)	Student ID	International Grade	National Study Programme	Birth - Month	Birth -Year	Gender	Attend <ISCED 0>	Age at <ISCED 1>	Repeat - <ISCED 1>	Repeat - <ISCED 2>	Repeat - <ISCED 3>	Truancy - Late for School	Truancy - Skip whole school day	Truancy - Skip classes within school day	At Home - Mother	At Home - Father	At Home - Brothers	At Home - Sisters	At Home - Grandparents	At Home - Others	Mother<Highest Schooling>	Mother Qualifications - <ISCED level 6>	Mother Qualifications - <ISCED level 5A>	Mother Qualifications - <ISCED level 5B>	Mother Qualifications - <ISCED level 4>	Mother Current Job Status	Father<Highest Schooling>	Father Qualifications - <ISCED level 6>	Father Qualifications - <ISCED level 5A>	Father Qualifications - <ISCED level 5B>	Father Qualifications - <ISCED level 4>	Father Current Job Status	Country of Birth International - Self	Country of Birth International - Mother	Country of Birth International - Father	Age of arrival in <country of test>	International Language at Home	Possessions - desk	Possessions - own room	Possessions - study place	Possessions - computer	Possessions - software	Possessions - Internet	Possessions - literature	Possessions - poetry	Possessions - art	Possessions - textbooks	Possessions - <technical reference books>	Possessions - dictionary	Possessions - dishwasher	Possessions - <DVD>	Possessions - <Country item 1>	Possessions - <Country item 2>	Possessions - <Country item 3>	How many - cellular phones	How many - televisions	How many - computers	How many - cars	How many - rooms bath or shower	How many books at home	Math Interest - Enjoy Reading	Instrumental Motivation - Worthwhile for Work	Math Interest - Look Forward to Lessons	Math Interest - Enjoy Maths	Instrumental Motivation - Worthwhile for Career Chances	Math Interest - Interested	Instrumental Motivation - Important for Future Study	Instrumental Motivation - Helps to Get a Job	Subjective Norms -Friends Do Well in Mathematics	Subjective Norms -Friends Work Hard on Mathematics	Subjective Norms - Friends Enjoy Mathematics Tests	Subjective Norms - Parents Believe Studying Mathematics Is Important	Subjective Norms - Parents Believe Mathematics Is Important for Career	Subjective Norms - Parents Like Mathematics	Math Self-Efficacy - Using a <Train Timetable>	Math Self-Efficacy - Calculating TV Discount	Math Self-Efficacy - Calculating Square Metres of Tiles	Math Self-Efficacy - Understanding Graphs in Newspapers	Math Self-Efficacy - Solving Equation 1	Math Self-Efficacy - Distance to Scale	Math Self-Efficacy - Solving Equation 2	Math Self-Efficacy - Calculate Petrol Consumption Rate	Math Anxiety - Worry That It Will Be Difficult	Math Self-Concept - Not Good at Maths	Math Anxiety - Get Very Tense	Math Self-Concept- Get Good <Grades>	Math Anxiety - Get Very Nervous	Math Self-Concept - Learn Quickly	Math Self-Concept - One of Best Subjects	Math Anxiety - Feel Helpless	Math Self-Concept - Understand Difficult Work	Math Anxiety - Worry About Getting Poor <Grades>	Perceived Control - Can Succeed with Enough Effort	Perceived Control - Doing Well is Completely Up to Me	Perceived Control - Family Demands and Problems	Perceived Control - Different Teachers	Perceived Control - If I Wanted I Could Perform Well	Perceived Control - Perform Poorly Regardless	Attributions to Failure - Not Good at Maths Problems	Attributions to Failure - Teacher Did Not Explain Well	Attributions to Failure - Bad Guesses	Attributions to Failure - Material Too Hard	Attributions to Failure - Teacher Didnt Get Students Interested	Attributions to Failure - Unlucky	Math Work Ethic - Homework Completed in Time	Math Work Ethic - Work Hard on Homework	Math Work Ethic - Prepared for Exams	Math Work Ethic - Study Hard for Quizzes	Math Work Ethic - Study Until I Understand Everything	Math Work Ethic - Pay Attention in Classes	Math Work Ethic - Listen in Classes	Math Work Ethic - Avoid Distractions When Studying	Math Work Ethic - Keep Work Organized	Math Intentions - Mathematics vs. Language Courses After School	Math Intentions - Mathematics vs. Science Related Major in College	Math Intentions - Study Harder in Mathematics vs. Language Classes	Math Intentions - Take Maximum Number of Mathematics vs. Science Classes	Math Intentions - Pursuing a Career That Involves Mathematics vs. Science	Math Behaviour - Talk about Maths with Friends	Math Behaviour - Help Friends with Maths	Math Behaviour - <Extracurricular> Activity	Math Behaviour - Participate in Competitions	Math Behaviour - Study More Than 2 Extra Hours a Day	Math Behaviour - Play Chess	Math Behaviour - Computer programming	Math Behaviour - Participate in Math Club	Learning Strategies- Important Parts vs. Existing Knowledge vs. Learn by Heart	Learning Strategies- Improve Understanding vs. New Ways vs. Memory	Learning Strategies - Other Subjects vs. Learning Goals vs. Rehearse Problems	Learning Strategies - Repeat Examples vs. Everyday Applications vs. More Information	Out of school lessons - <test lang>	Out of school lessons - <maths>	Out of school lessons - <science>	Out of school lessons - other	Out-of-School Study Time - Homework	Out-of-School Study Time - Guided Homework	Out-of-School Study Time - Personal Tutor	Out-of-School Study Time - Commercial Company	Out-of-School Study Time - With Parent	Out-of-School Study Time - Computer	Experience with Applied Maths Tasks - Use <Train Timetable>	Experience with Applied Maths Tasks - Calculate Price including Tax	Experience with Applied Maths Tasks - Calculate Square Metres	Experience with Applied Maths Tasks - Understand Scientific Tables	Experience with Pure Maths Tasks - Solve Equation 1	Experience with Applied Maths Tasks - Use a Map to Calculate Distance	Experience with Pure Maths Tasks - Solve Equation 2	Experience with Applied Maths Tasks - Calculate Power Consumption Rate	Experience with Applied Maths Tasks - Solve Equation 3	Familiarity with Math Concepts - Exponential Function	Familiarity with Math Concepts - Divisor	Familiarity with Math Concepts - Quadratic Function	Overclaiming - Proper Number	Familiarity with Math Concepts - Linear Equation	Familiarity with Math Concepts - Vectors	Familiarity with Math Concepts - Complex Number	Familiarity with Math Concepts - Rational Number	Familiarity with Math Concepts - Radicals	Overclaiming - Subjunctive Scaling	Familiarity with Math Concepts - Polygon	Overclaiming - Declarative Fraction	Familiarity with Math Concepts - Congruent Figure	Familiarity with Math Concepts - Cosine	Familiarity with Math Concepts - Arithmetic Mean	Familiarity with Math Concepts - Probability	Min in <class period> - <test lang>	Min in <class period> - <Maths>	Min in <class period> - <Science>	No of <class period> p/wk - <test lang>	No of <class period> p/wk - <Maths>	No of <class period> p/wk - <Science>	No of ALL <class period> a week	Class Size - No of Students in <Test Language> Class	OTL - Algebraic Word Problem in Math Lesson	OTL - Algebraic Word Problem in Tests	OTL - Procedural Task in Math Lesson	OTL - Procedural Task in Tests	OTL - Pure Math Reasoning in Math Lesson	OTL - Pure Math Reasoning in Tests	OTL - Applied Math Reasoning in Math Lesson	OTL - Applied Math Reasoning in Tests	Math Teaching - Teacher shows interest	Math Teaching - Extra help	Math Teaching - Teacher helps	Math Teaching - Teacher continues	Math Teaching - Express opinions	Teacher-Directed Instruction - Sets Clear Goals	Teacher-Directed Instruction - Encourages Thinking and Reasoning	Student Orientation - Differentiates Between Students When Giving Tasks	Student Orientation - Assigns Complex Projects	Formative Assessment - Gives Feedback	Teacher-Directed Instruction - Checks Understanding	Student Orientation - Has Students Work in Small Groups	Teacher-Directed Instruction - Summarizes Previous Lessons	Student Orientation - Plans Classroom Activities	Formative Assessment - Gives Feedback on Strengths and Weaknesses	Formative Assessment - Informs about Expectations	Teacher-Directed Instruction - Informs about Learning Goals	Formative Assessment - Tells How to Get Better	Cognitive Activation - Teacher Encourages to Reflect Problems	Cognitive Activation - Gives Problems that Require to Think	Cognitive Activation - Asks to Use Own Procedures	Cognitive Activation - Presents Problems with No Obvious Solutions	Cognitive Activation - Presents Problems in Different Contexts	Cognitive Activation - Helps Learn from Mistakes	Cognitive Activation - Asks for Explanations	Cognitive Activation - Apply What We Learned	Cognitive Activation - Problems with Multiple Solutions	Disciplinary Climate - Students Dont Listen	Disciplinary Climate - Noise and Disorder	Disciplinary Climate - Teacher Has to Wait Until its Quiet	Disciplinary Climate - Students Dont Work Well	Disciplinary Climate - Students Start Working Late	Vignette Teacher Support -Homework Every Other Day/Back in Time	Vignette Teacher Support - Homework Once a Week/Back in Time	Vignette Teacher Support - Homework Once a Week/Not Back in Time	Teacher Support - Lets Us Know We Have to Work Hard	Teacher Support - Provides Extra Help When Needed	Teacher Support - Helps Students with Learning	Teacher Support - Gives Opportunity to Express Opinions	Vignette Classroom Management - Students Frequently Interrupt/Teacher Arrives Early	Vignette Classroom Management - Students Are Calm/Teacher Arrives on Time	Vignette Classroom Management - Students Frequently Interrupt/Teacher Arrives Late	Classroom Management - Students Listen	Classroom Management - Teacher Keeps Class Orderly	Classroom Management - Teacher Starts On Time	Classroom Management - Wait Long to <Quiet Down>	Student-Teacher Relation - Get Along with Teachers	Student-Teacher Relation - Teachers Are Interested	Student-Teacher Relation - Teachers Listen to Students	Student-Teacher Relation - Teachers Help Students	Student-Teacher Relation - Teachers Treat Students Fair	Sense of Belonging - Feel Like Outsider	Sense of Belonging - Make Friends Easily	Sense of Belonging - Belong at School	Sense of Belonging - Feel Awkward at School	Sense of Belonging - Liked by Other Students	Sense of Belonging - Feel Lonely at School	Sense of Belonging - Feel Happy at School	Sense of Belonging - Things Are Ideal at School	Sense of Belonging - Satisfied at School	Attitude towards School - Does Little to Prepare Me for Life	Attitude towards School - Waste of Time	Attitude towards School - Gave Me Confidence	Attitude towards School- Useful for Job	Attitude toward School - Helps to Get a Job	Attitude toward School - Prepare for College	Attitude toward School - Enjoy Good Grades	Attitude toward School - Trying Hard is Important	Perceived Control - Can Succeed with Enough Effort	Perceived Control - My Choice Whether I Will Be Good	Perceived Control - Problems Prevent from Putting Effort into School	Perceived Control - Different Teachers Would Make Me Try Harder	Perceived Control - Could Perform Well if I Wanted	Perceived Control - Perform Poor Regardless	Perseverance - Give up easily	Perseverance - Put off difficult problems	Perseverance - Remain interested	Perseverance - Continue to perfection	Perseverance - Exceed expectations	Openness for Problem Solving - Can Handle a Lot of Information	Openness for Problem Solving - Quick to Understand	Openness for Problem Solving - Seek Explanations	Openness for Problem Solving - Can Link Facts	Openness for Problem Solving - Like to Solve Complex Problems	Problem Text Message - Press every button	Problem Text Message - Trace steps	Problem Text Message - Manual	Problem Text Message - Ask a friend	Problem Route Selection - Read brochure	Problem Route Selection - Study map	Problem Route Selection - Leave it to brother	Problem Route Selection - Just drive	Problem Ticket Machine - Similarities	Problem Ticket Machine - Try buttons	Problem Ticket Machine - Ask for help	Problem Ticket Machine - Find ticket office	At Home - Desktop Computer	At Home - Portable laptop	At Home - Tablet computer	At Home - Internet connection	At Home - Video games console	At Home - Cell phone w/o Internet	At Home - Cell phone with Internet	At Home - Mp3/Mp4 player	At Home - Printer	At Home - USB (memory) stick	At Home - Ebook reader	At school - Desktop Computer	At school - Portable laptop	At school - Tablet computer	At school - Internet connection	At school - Printer	At school - USB (memory) stick	At school - Ebook reader	First use of computers	First access to Internet	Internet at School	Internet out-of-school - Weekday	Internet out-of-school - Weekend	Out-of-school 8 - One player games.	Out-of-school 8 - ColLabourative games.	Out-of-school 8 - Use email	Out-of-school 8 - Chat on line	Out-of-school 8 - Social networks	Out-of-school 8 - Browse the Internet for fun	Out-of-school 8 - Read news	Out-of-school 8 - Obtain practical information from the Internet	Out-of-school 8 - Download music	Out-of-school 8 - Upload content	Out-of-school 9 - Internet for school	Out-of-school 9 - Email students	Out-of-school 9 - Email teachers	Out-of-school 9 - Download from School	Out-of-school 9 - Announcements	Out-of-school 9 - Homework	Out-of-school 9 - Share school material	At School - Chat on line	At School - Email	At School - Browse for schoolwork	At School - Download from website	At School - Post on website	At School - Simulations	At School - Practice and drilling	At School - Homework	At School - Group work	Maths lessons - Draw graph	Maths lessons - Calculation with numbers	Maths lessons - Geometric figures	Maths lessons - Spreadsheet	Maths lessons - Algebra	Maths lessons - Histograms	Maths lessons - Change in graphs	Attitudes - Useful for schoolwork	Attitudes - Homework more fun	Attitudes - Source of information	Attitudes - Troublesome	Attitudes - Not suitable for schoolwork	Attitudes - Too unreliable	Miss 2 months of <ISCED 1>	Miss 2 months of <ISCED 2>	Future Orientation - Internship	Future Orientation - Work-site visits	Future Orientation - Job fair	Future Orientation - Career advisor at school	Future Orientation - Career advisor outside school	Future Orientation - Questionnaire	Future Orientation - Internet search	Future Orientation - Tour<ISCED 3-5> institution	Future Orientation - web search <ISCED 3-5> prog	Future Orientation - <country specific item>	Acquired skills - Find job info - Yes, at school	Acquired skills - Find job info - Yes, out of school	Acquired skills - Find job info - No, never	Acquired skills - Search for job - Yes, at school	Acquired skills - Search for job - Yes, out of school	Acquired skills - Search for job - No, never	Acquired skills - Write resume - Yes, at school	Acquired skills - Write resume - Yes, out of school	Acquired skills - Write resume - No, never	Acquired skills - Job interview - Yes, at school	Acquired skills - Job interview - Yes, out of school	Acquired skills - Job interview - No, never	Acquired skills - ISCED 3-5 programs - Yes, at school	Acquired skills - ISCED 3-5 programs - Yes, out of school	Acquired skills - ISCED 3-5 programs - No, never	Acquired skills - Student financing - Yes, at school	Acquired skills - Student financing - Yes, out of school	Acquired skills - Student financing - No, never	First language learned	Age started learning <test language>	Language spoken - Mother	Language spoken - Father	Language spoken - Siblings	Language spoken - Best friend	Language spoken - Schoolmates	Activities language - Reading	Activities language - Watching TV	Activities language - Internet surfing	Activities language - Writing emails	Types of support <test language> - remedial lessons	Amount of support <test language>	Attend lessons <heritage language> - focused	Attend lessons <heritage language> - school subjects	Instruction in <heritage language>	Acculturation - Mother Immigrant (Filter)	Acculturation - Enjoy <Host Culture> Friends	Acculturation - Enjoy <Heritage Culture> Friends	Acculturation - Enjoy <Host Culture> Celebrations	Acculturation - Enjoy <Heritage Culture> Celebrations	Acculturation - Spend Time with <Host Culture> Friends	Acculturation - Spend Time with <Heritage Culture> Friends	Acculturation - Participate in <Host Culture> Celebrations	Acculturation - Participate in <Heritage Culture> Celebrations	Acculturation - Perceived Host-Heritage Cultural Differences - Values	Acculturation - Perceived Host-Heritage Cultural Differences - Mother Treatment	Acculturation - Perceived Host-Heritage Cultural Differences - Teacher Treatment	Calculator Use	Effort-real 1	Effort-real 2	Difference in Effort	Student Questionnaire Form	Booklet ID	Standard or simplified set of booklets	Age of student	Grade compared to modal grade in country	Unique national study programme code	Mathematics Anxiety	Attitude towards School: Learning Outcomes	Attitude towards School: Learning Activities	Sense of Belonging to School	Father SQ ISEI	Mother SQ ISEI	Mathematics Teacher's Classroom Management	Country of Birth National Categories- Father	Country of Birth National Categories- Mother	Country of Birth National Categories- Self	Cognitive Activation in Mathematics Lessons	Cultural Distance between Host and Heritage Culture	Cultural Possessions	Disciplinary Climate	ICT Entertainment Use	Index of economic, social and cultural status	Experience with Applied Mathematics Tasks at School	Experience with Pure Mathematics Tasks at School	Attributions to Failure in Mathematics	Familiarity with Mathematical Concepts	Familiarity with Mathematical Concepts (Signal Detection Adjusted)	Family Structure	Educational level of father (ISCED)	Home educational resources	Acculturation: Heritage Culture Oriented Strategies	Highest educational level of parents	Highest parental occupational status	Home Possessions	ICT Use at Home for School-related Tasks	Acculturation: Host Culture Oriented Strategies	Attitudes Towards Computers: Limitations of the Computer as a Tool for School Learning	Attitudes Towards Computers: Computer as a Tool for School Learning	ICT Availability at Home	ICT resources	ICT Availability at School	Immigration status	Information about Careers	Information about the Labour Market provided by the School	Information about the Labour Market provided outside of School	Instrumental Motivation for Mathematics	Mathematics Interest	ISCED designation	ISCED level	ISCED orientation	Preference for Heritage Language in Conversations with Family and Friends	Language at home (3-digit code)	Preference for Heritage Language in Language Reception and Production	Learning time (minutes per week) - <test language>	Mathematics Behaviour	Mathematics Self-Efficacy	Mathematics Intentions	Mathematics Work Ethic	Educational level of mother (ISCED)	Learning time (minutes per week)- <Mathematics>	Mathematics Teacher's Support	ISCO-08 Occupation code - Mother	ISCO-08 Occupation code - Father	Openness for Problem Solving	Out-of-School Study Time	Highest parental education in years	Perseverance	Grade Repetition	Mathematics Self-Concept	Learning time (minutes per week) - <Science>	Teacher Student Relations	Subjective Norms in Mathematics	Teacher Behaviour: Formative Assessment	Teacher Behaviour: Student Orientation	Teacher Behaviour: Teacher-directed Instruction	Teacher Support	Language of the test	Time of computer use (mins)	Use of ICT in Mathematic Lessons	Use of ICT at School	Wealth	Attitude towards School: Learning Outcomes (Anchored)	Attitude towards School: Learning Activities (Anchored)	Sense of Belonging to School (Anchored)	Mathematics Teacher's Classroom Management (Anchored)	Cognitive Activation in Mathematics Lessons (Anchored)	Instrumental Motivation for Mathematics (Anchored)	Mathematics Interest (Anchored)	Mathematics Work Ethic (Anchored)	Mathematics Teacher's Support (Anchored)	Mathematics Self-Concept (Anchored)	Teacher Student Relations (Anchored)	Subjective Norms in Mathematics (Anchored)	Plausible value 1 in mathematics	Plausible value 2 in mathematics	Plausible value 3 in mathematics	Plausible value 4 in mathematics	Plausible value 5 in mathematics	Plausible value 1 in content subscale of math - Change and Relationships	Plausible value 2 in content subscale of math - Change and Relationships	Plausible value 3 in content subscale of math - Change and Relationships	Plausible value 4 in content subscale of math - Change and Relationships	Plausible value 5 in content subscale of math - Change and Relationships	Plausible value 1 in content subscale of math - Quantity	Plausible value 2 in content subscale of math - Quantity	Plausible value 3 in content subscale of math - Quantity	Plausible value 4 in content subscale of math - Quantity	Plausible value 5 in content subscale of math - Quantity	Plausible value 1 in content subscale of math - Space and Shape	Plausible value 2 in content subscale of math - Space and Shape	Plausible value 3 in content subscale of math - Space and Shape	Plausible value 4 in content subscale of math - Space and Shape	Plausible value 5 in content subscale of math - Space and Shape	Plausible value 1 in content subscale of math - Uncertainty and Data	Plausible value 2 in content subscale of math - Uncertainty and Data	Plausible value 3 in content subscale of math - Uncertainty and Data	Plausible value 4 in content subscale of math - Uncertainty and Data	Plausible value 5 in content subscale of math - Uncertainty and Data	Plausible value 1 in process subscale of math - Employ	Plausible value 2 in process subscale of math - Employ	Plausible value 3 in process subscale of math - Employ	Plausible value 4 in process subscale of math - Employ	Plausible value 5 in process subscale of math - Employ	Plausible value 1 in process subscale of math - Formulate	Plausible value 2 in process subscale of math - Formulate	Plausible value 3 in process subscale of math - Formulate	Plausible value 4 in process subscale of math - Formulate	Plausible value 5 in process subscale of math - Formulate	Plausible value 1 in process subscale of math - Interpret	Plausible value 2 in process subscale of math - Interpret	Plausible value 3 in process subscale of math - Interpret	Plausible value 4 in process subscale of math - Interpret	Plausible value 5 in process subscale of math - Interpret	Plausible value 1 in reading	Plausible value 2 in reading	Plausible value 3 in reading	Plausible value 4 in reading	Plausible value 5 in reading	Plausible value 1 in science	Plausible value 2 in science	Plausible value 3 in science	Plausible value 4 in science	Plausible value 5 in science	FINAL STUDENT WEIGHT	FINAL STUDENT REPLICATE BRR-FAY WEIGHT1	FINAL STUDENT REPLICATE BRR-FAY WEIGHT2	FINAL STUDENT REPLICATE BRR-FAY WEIGHT3	FINAL STUDENT REPLICATE BRR-FAY WEIGHT4	FINAL STUDENT REPLICATE BRR-FAY WEIGHT5	FINAL STUDENT REPLICATE BRR-FAY WEIGHT6	FINAL STUDENT REPLICATE BRR-FAY WEIGHT7	FINAL STUDENT REPLICATE BRR-FAY WEIGHT8	FINAL STUDENT REPLICATE BRR-FAY WEIGHT9	FINAL STUDENT REPLICATE BRR-FAY WEIGHT10	FINAL STUDENT REPLICATE BRR-FAY WEIGHT11	FINAL STUDENT REPLICATE BRR-FAY WEIGHT12	FINAL STUDENT REPLICATE BRR-FAY WEIGHT13	FINAL STUDENT REPLICATE BRR-FAY WEIGHT14	FINAL STUDENT REPLICATE BRR-FAY WEIGHT15	FINAL STUDENT REPLICATE BRR-FAY WEIGHT16	FINAL STUDENT REPLICATE BRR-FAY WEIGHT17	FINAL STUDENT REPLICATE BRR-FAY WEIGHT18	FINAL STUDENT REPLICATE BRR-FAY WEIGHT19	FINAL STUDENT REPLICATE BRR-FAY WEIGHT20	FINAL STUDENT REPLICATE BRR-FAY WEIGHT21	FINAL STUDENT REPLICATE BRR-FAY WEIGHT22	FINAL STUDENT REPLICATE BRR-FAY WEIGHT23	FINAL STUDENT REPLICATE BRR-FAY WEIGHT24	FINAL STUDENT REPLICATE BRR-FAY WEIGHT25	FINAL STUDENT REPLICATE BRR-FAY WEIGHT26	FINAL STUDENT REPLICATE BRR-FAY WEIGHT27	FINAL STUDENT REPLICATE BRR-FAY WEIGHT28	FINAL STUDENT REPLICATE BRR-FAY WEIGHT29	FINAL STUDENT REPLICATE BRR-FAY WEIGHT30	FINAL STUDENT REPLICATE BRR-FAY WEIGHT31	FINAL STUDENT REPLICATE BRR-FAY WEIGHT32	FINAL STUDENT REPLICATE BRR-FAY WEIGHT33	FINAL STUDENT REPLICATE BRR-FAY WEIGHT34	FINAL STUDENT REPLICATE BRR-FAY WEIGHT35	FINAL STUDENT REPLICATE BRR-FAY WEIGHT36	FINAL STUDENT REPLICATE BRR-FAY WEIGHT37	FINAL STUDENT REPLICATE BRR-FAY WEIGHT38	FINAL STUDENT REPLICATE BRR-FAY WEIGHT39	FINAL STUDENT REPLICATE BRR-FAY WEIGHT40	FINAL STUDENT REPLICATE BRR-FAY WEIGHT41	FINAL STUDENT REPLICATE BRR-FAY WEIGHT42	FINAL STUDENT REPLICATE BRR-FAY WEIGHT43	FINAL STUDENT REPLICATE BRR-FAY WEIGHT44	FINAL STUDENT REPLICATE BRR-FAY WEIGHT45	FINAL STUDENT REPLICATE BRR-FAY WEIGHT46	FINAL STUDENT REPLICATE BRR-FAY WEIGHT47	FINAL STUDENT REPLICATE BRR-FAY WEIGHT48	FINAL STUDENT REPLICATE BRR-FAY WEIGHT49	FINAL STUDENT REPLICATE BRR-FAY WEIGHT50	FINAL STUDENT REPLICATE BRR-FAY WEIGHT51	FINAL STUDENT REPLICATE BRR-FAY WEIGHT52	FINAL STUDENT REPLICATE BRR-FAY WEIGHT53	FINAL STUDENT REPLICATE BRR-FAY WEIGHT54	FINAL STUDENT REPLICATE BRR-FAY WEIGHT55	FINAL STUDENT REPLICATE BRR-FAY WEIGHT56	FINAL STUDENT REPLICATE BRR-FAY WEIGHT57	FINAL STUDENT REPLICATE BRR-FAY WEIGHT58	FINAL STUDENT REPLICATE BRR-FAY WEIGHT59	FINAL STUDENT REPLICATE BRR-FAY WEIGHT60	FINAL STUDENT REPLICATE BRR-FAY WEIGHT61	FINAL STUDENT REPLICATE BRR-FAY WEIGHT62	FINAL STUDENT REPLICATE BRR-FAY WEIGHT63	FINAL STUDENT REPLICATE BRR-FAY WEIGHT64	FINAL STUDENT REPLICATE BRR-FAY WEIGHT65	FINAL STUDENT REPLICATE BRR-FAY WEIGHT66	FINAL STUDENT REPLICATE BRR-FAY WEIGHT67	FINAL STUDENT REPLICATE BRR-FAY WEIGHT68	FINAL STUDENT REPLICATE BRR-FAY WEIGHT69	FINAL STUDENT REPLICATE BRR-FAY WEIGHT70	FINAL STUDENT REPLICATE BRR-FAY WEIGHT71	FINAL STUDENT REPLICATE BRR-FAY WEIGHT72	FINAL STUDENT REPLICATE BRR-FAY WEIGHT73	FINAL STUDENT REPLICATE BRR-FAY WEIGHT74	FINAL STUDENT REPLICATE BRR-FAY WEIGHT75	FINAL STUDENT REPLICATE BRR-FAY WEIGHT76	FINAL STUDENT REPLICATE BRR-FAY WEIGHT77	FINAL STUDENT REPLICATE BRR-FAY WEIGHT78	FINAL STUDENT REPLICATE BRR-FAY WEIGHT79	FINAL STUDENT REPLICATE BRR-FAY WEIGHT80	RANDOMIZED FINAL VARIANCE STRATUM (1-80)	RANDOMLY ASSIGNED VARIANCE UNIT	Senate weight - sum of weight within the country is 1000	Date of the database creation
+0	Albania	80000	ALB0006	Non-OECD	Albania	1	1	10	1.0	2	1996	Female	No	6.0	No, never	No, never	No, never	None	None	1.0	Yes	Yes	Yes	Yes	NaN	NaN	<ISCED level 3A>	No	No	No	No	Other (e.g. home duties, retired)	<ISCED level 3A>	NaN	NaN	NaN	NaN	Working part-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	No	Yes	No	No	No	No	Yes	No	Yes	No	Yes	No	Yes	8002	8001	8002	Two	One	None	None	None	0-10 books	Agree	Strongly agree	Agree	Agree	Agree	Agree	Agree	Strongly agree	Disagree	Agree	Disagree	Agree	Agree	Agree	Not at all confident	Not very confident	Confident	Confident	Confident	Not at all confident	Confident	Very confident	Agree	Disagree	Agree	Agree	Agree	Agree	Agree	Disagree	Disagree	Disagree	Agree	Disagree	Disagree	Agree	NaN	Disagree	Likely	Slightly likely	Likely	Likely	Likely	Very Likely	Agree	Agree	Agree	Agree	Agree	Agree	Agree	Agree	Agree	Courses after school Test Language	Major in college Science	Study harder Test Language	Maximum classes Science	Pursuing a career Math	Often	Sometimes	Sometimes	Sometimes	Sometimes	Never or rarely	Never or rarely	Never or rarely	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Never or Hardly Ever	Most Lessons	Never or Hardly Ever	Every Lesson	Most Lessons	Every Lesson	Every Lesson	Every Lesson	Never or Hardly Ever	Most Lessons	Every Lesson	Every Lesson	Every Lesson	Always or almost always	Sometimes	Never or rarely	Always or almost always	Always or almost always	Always or almost always	Always or almost always	Often	Often	Never or Hardly Ever	Never or Hardly Ever	Never or Hardly Ever	Never or Hardly Ever	Never or Hardly Ever	Strongly disagree	Strongly disagree	Strongly disagree	Strongly disagree	Agree	Agree	Agree	Strongly agree	Strongly agree	Disagree	Agree	Strongly disagree	Disagree	Agree	Agree	Strongly disagree	Agree	Agree	Disagree	Agree	Agree	Strongly disagree	Strongly agree	Strongly agree	Strongly disagree	Agree	Strongly disagree	Agree	Agree	Strongly agree	Strongly disagree	Strongly disagree	Agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly disagree	Disagree	Strongly disagree	Very much like me	Very much like me	Very much like me	Somewhat like me	Very much like me	Somewhat like me	Mostly like me	Mostly like me	Mostly like me	Somewhat like me	definitely do this	definitely do this	definitely do this	definitely do this	4.0	2.0	1.0	1.0	1.0	2.0	1.0	1.0	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	99	99	99	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	A Simple calculator	99	99	99	StQ Form B	booklet 7	Standard set of booklets	16.17	0.0	Albania: Upper secondary education	0.32	-2.31	0.5206	-1.18	76.49	79.74	-1.3771	Albania	Albania	Albania	0.6994	NaN	-0.48	1.85	NaN	NaN	NaN	NaN	0.6400	NaN	NaN	2.0	ISCED 3A, ISCED 4	-1.29	NaN	ISCED 3A, ISCED 4	NaN	-2.61	NaN	NaN	NaN	NaN	NaN	-3.16	NaN	Native	NaN	NaN	NaN	0.80	0.91	A	ISCED level 3	General	NaN	Albanian	NaN	NaN	0.6426	-0.77	-0.7332	0.2882	ISCED 3A, ISCED 4	NaN	-0.9508	Building architects	Primary school teachers	0.0521	NaN	12.0	-0.3407	Did not repeat a <grade>	0.41	NaN	-1.04	-0.0455	1.3625	0.9374	0.4297	1.68	Albanian	NaN	NaN	NaN	-2.92	-1.8636	-0.6779	-0.7351	-0.7808	-0.0219	-0.1562	0.0486	-0.2199	-0.5983	-0.0807	-0.5901	-0.3346	406.8469	376.4683	344.5319	321.1637	381.9209	325.8374	324.2795	279.8800	267.4170	312.5954	409.1837	388.1524	373.3525	389.7102	415.4152	351.5423	375.6894	341.4161	386.5945	426.3203	396.7207	334.4057	328.9531	339.8582	354.6580	324.2795	345.3108	381.1419	380.3630	346.8687	319.6059	345.3108	360.8895	390.4892	322.7216	290.7852	345.3108	326.6163	407.6258	367.1210	249.5762	254.3420	406.8496	175.7053	218.5981	341.7009	408.8400	348.2283	367.8105	392.9877	8.9096	13.1249	13.0829	4.5315	13.0829	13.9235	13.1249	13.1249	4.3389	4.3313	13.7954	4.5315	4.3313	13.7954	13.9235	4.3389	4.3313	4.5084	4.5084	13.7954	4.5315	13.1249	13.0829	4.5315	13.0829	13.9235	13.1249	13.1249	4.3389	4.3313	13.7954	4.5315	4.3313	13.7954	13.9235	4.3389	4.3313	4.5084	4.5084	13.7954	4.5315	4.5084	4.5315	13.0829	4.5315	4.3313	4.5084	4.5084	13.7954	13.9235	4.3389	13.0829	13.9235	4.3389	4.3313	13.7954	13.9235	13.1249	13.1249	4.3389	13.0829	4.5084	4.5315	13.0829	4.5315	4.3313	4.5084	4.5084	13.7954	13.9235	4.3389	13.0829	13.9235	4.3389	4.3313	13.7954	13.9235	13.1249	13.1249	4.3389	13.0829	19	1	0.2098	22NOV13
+1	Albania	80000	ALB0006	Non-OECD	Albania	1	2	10	1.0	2	1996	Female	Yes, for more than one year	7.0	No, never	No, never	No, never	One or two times	None	1.0	Yes	Yes	NaN	Yes	NaN	NaN	<ISCED level 3A>	Yes	Yes	No	No	Working full-time <for pay>	<ISCED level 3A>	No	No	No	No	Working full-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	8001	8001	8002	Three or more	Three or more	Three or more	Two	Two	201-500 books	Disagree	Strongly agree	Disagree	Disagree	Agree	Agree	Disagree	Disagree	Strongly agree	Strongly agree	Disagree	Agree	Disagree	Agree	Confident	Very confident	Very confident	Confident	Very confident	Confident	Very confident	Not very confident	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Strongly agree	Strongly agree	Strongly disagree	Disagree	Agree	Disagree	Likely	Slightly likely	Slightly likely	Very Likely	Slightly likely	Likely	Agree	Agree	Strongly agree	Strongly agree	Strongly agree	Agree	Agree	Disagree	Agree	Courses after school Math	Major in college Science	Study harder Math	Maximum classes Science	Pursuing a career Science	Sometimes	Often	Always or almost always	Sometimes	Always or almost always	Never or rarely	Never or rarely	Often	relating to known	Improve understanding	in my sleep	Repeat examples	I do not attend <out-of-school time lessons> i...	2 or more but less than 4 hours a week	2 or more but less than 4 hours a week	Less than 2 hours a week	NaN	NaN	6.0	0.0	0.0	2.0	Rarely	Rarely	Frequently	Sometimes	Frequently	Sometimes	Frequently	Never	Frequently	Know it well, understand the concept	Know it well, understand the concept	Heard of it once or twice	Know it well, understand the concept	Know it well, understand the concept	Know it well, understand the concept	Never heard of it	Know it well, understand the concept	Know it well, understand the concept	Never heard of it	Know it well, understand the concept	Heard of it once or twice	Know it well, understand the concept	Know it well, understand the concept	Never heard of it	Heard of it often	45.0	45.0	45.0	7.0	6.0	2.0	NaN	30.0	Frequently	Sometimes	Frequently	Frequently	Sometimes	Sometimes	Sometimes	Sometimes	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Not at all like me	Not at all like me	Mostly like me	Somewhat like me	Very much like me	Somewhat like me	Not much like me	Not much like me	Mostly like me	Not much like me	probably not do this	probably do this	probably not do this	probably do this	1.0	2.0	3.0	2.0	2.0	3.0	1.0	1.0	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	99	99	99	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	A Simple calculator	99	99	99	StQ Form A	booklet 9	Standard set of booklets	16.17	0.0	Albania: Upper secondary education	NaN	NaN	NaN	NaN	15.35	23.47	NaN	Albania	Albania	Albania	NaN	NaN	1.27	NaN	NaN	NaN	-0.0681	0.7955	0.1524	0.6387	-0.08	2.0	ISCED 3A, ISCED 4	1.12	NaN	ISCED 5A, 6	NaN	1.41	NaN	NaN	NaN	NaN	NaN	1.15	NaN	Native	NaN	NaN	NaN	-0.39	0.00	A	ISCED level 3	General	NaN	Albanian	NaN	315.0	1.4702	0.34	-0.2514	0.6490	ISCED 5A, 6	270.0	NaN	Tailors, dressmakers, furriers and hatters	Building construction labourers	-0.9492	8.0	16.0	1.3116	Did not repeat a <grade>	NaN	90.0	NaN	0.6602	NaN	NaN	NaN	NaN	Albanian	NaN	NaN	NaN	0.69	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	486.1427	464.3325	453.4273	472.9008	476.0165	325.6816	419.9330	378.6493	359.9548	384.1019	373.1968	444.0801	456.5431	401.2385	461.2167	366.9653	459.6588	426.1645	423.0488	443.3011	389.5544	438.6275	417.5962	379.4283	438.6275	440.1854	456.5431	486.9216	458.1010	444.0801	411.3647	437.8486	457.3220	454.2063	460.4378	434.7328	448.7537	494.7110	429.2803	434.7328	406.2936	349.8975	400.7334	369.7553	396.7618	548.9929	471.5964	471.5964	443.6218	454.8116	8.9096	13.1249	13.0829	4.5315	13.0829	13.9235	13.1249	13.1249	4.3389	4.3313	13.7954	4.5315	4.3313	13.7954	13.9235	4.3389	4.3313	4.5084	4.5084	13.7954	4.5315	13.1249	13.0829	4.5315	13.0829	13.9235	13.1249	13.1249	4.3389	4.3313	13.7954	4.5315	4.3313	13.7954	13.9235	4.3389	4.3313	4.5084	4.5084	13.7954	4.5315	4.5084	4.5315	13.0829	4.5315	4.3313	4.5084	4.5084	13.7954	13.9235	4.3389	13.0829	13.9235	4.3389	4.3313	13.7954	13.9235	13.1249	13.1249	4.3389	13.0829	4.5084	4.5315	13.0829	4.5315	4.3313	4.5084	4.5084	13.7954	13.9235	4.3389	13.0829	13.9235	4.3389	4.3313	13.7954	13.9235	13.1249	13.1249	4.3389	13.0829	19	1	0.2098	22NOV13
+2	Albania	80000	ALB0006	Non-OECD	Albania	1	3	9	1.0	9	1996	Female	Yes, for more than one year	6.0	No, never	No, never	No, never	None	None	1.0	Yes	Yes	No	Yes	No	No	<ISCED level 3B, 3C>	Yes	Yes	Yes	No	Working full-time <for pay>	<ISCED level 3A>	Yes	No	Yes	Yes	Working full-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	Yes	Yes	Yes	No	Yes	Yes	Yes	Yes	Yes	No	Yes	No	Yes	8001	8001	8001	Three or more	Two	Two	One	Two	More than 500 books	Agree	Strongly agree	Agree	Agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Agree	Strongly agree	Strongly agree	Agree	Confident	Very confident	Very confident	Confident	Very confident	Not very confident	Very confident	Confident	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Strongly agree	Agree	Strongly agree	Strongly disagree	Strongly agree	Strongly disagree	Likely	Likely	Very Likely	Very Likely	Very Likely	Slightly likely	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Agree	Strongly agree	Strongly agree	Strongly agree	Courses after school Math	Major in college Science	Study harder Math	Maximum classes Science	Pursuing a career Science	Sometimes	Always or almost always	Sometimes	Never or rarely	Always or almost always	Never or rarely	Never or rarely	Never or rarely	Most important	Improve understanding	learning goals	more information	Less than 2 hours a week	2 or more but less than 4 hours a week	4 or more but less than 6 hours a week	I do not attend <out-of-school time lessons> i...	NaN	6.0	6.0	7.0	2.0	3.0	Frequently	Sometimes	Frequently	Rarely	Frequently	Rarely	Frequently	Sometimes	Frequently	Never heard of it	Know it well, understand the concept	Heard of it once or twice	Know it well, understand the concept	Know it well, understand the concept	Know it well, understand the concept	Heard of it once or twice	Know it well, understand the concept	Know it well, understand the concept	Heard of it once or twice	Know it well, understand the concept	Know it well, understand the concept	Know it well, understand the concept	Know it well, understand the concept	Know it well, understand the concept	Know it well, understand the concept	60.0	NaN	NaN	5.0	4.0	2.0	24.0	30.0	Frequently	Frequently	Frequently	Frequently	Frequently	Frequently	Rarely	Rarely	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Not much like me	Not much like me	Very much like me	Very much like me	Somewhat like me	Mostly like me	Mostly like me	Very much like me	Mostly like me	Very much like me	probably not do this	definitely do this	definitely not do this	probably do this	1.0	3.0	4.0	1.0	3.0	4.0	1.0	1.0	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	99	99	99	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	A Simple calculator	99	99	99	StQ Form A	booklet 3	Standard set of booklets	15.58	-1.0	Albania: Lower secondary education	NaN	NaN	NaN	NaN	22.57	NaN	NaN	Albania	Albania	Albania	NaN	NaN	1.27	NaN	NaN	NaN	0.5359	0.7955	1.2219	0.8215	-0.89	2.0	ISCED 5A, 6	-0.69	NaN	ISCED 5A, 6	NaN	0.14	NaN	NaN	NaN	NaN	NaN	-0.40	NaN	Native	NaN	NaN	NaN	1.59	1.23	A	ISCED level 2	General	NaN	Albanian	NaN	300.0	0.9618	0.34	-0.2514	2.0389	ISCED 5A, 6	NaN	NaN	Housewife	Bricklayers and related workers	0.9383	24.0	16.0	0.9918	Did not repeat a <grade>	NaN	NaN	NaN	2.2350	NaN	NaN	NaN	NaN	Albanian	NaN	NaN	NaN	-0.23	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	533.2684	481.0796	489.6479	490.4269	533.2684	611.1622	486.5322	567.5417	541.0578	544.9525	597.1413	495.1005	576.8889	507.5635	556.6365	594.8045	473.2902	554.2997	537.1631	568.3206	471.7324	431.2276	460.8272	419.5435	456.9325	559.7523	501.3320	555.0787	467.0587	506.7845	580.7836	481.0796	555.0787	453.8168	491.2058	527.0369	444.4695	516.1318	403.9648	476.4060	401.2100	404.3872	387.7067	431.3938	401.2100	499.6643	428.7952	492.2044	512.7191	499.6643	8.4871	12.7307	12.7307	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	12.7307	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	12.7307	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	4.2436	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	4.2436	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	12.7307	19	1	0.1999	22NOV13
+3	Albania	80000	ALB0006	Non-OECD	Albania	1	4	9	1.0	8	1996	Female	Yes, for more than one year	6.0	No, never	No, never	No, never	None	None	1.0	Yes	Yes	No	Yes	No	No	<ISCED level 3B, 3C>	No	No	No	No	Working full-time <for pay>	<ISCED level 3A>	Yes	Yes	No	No	Working full-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	Yes	No	Yes	Yes	No	8001	8001	8002	Three or more	Two	One	None	One	11-25 books	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Strongly agree	Disagree	Agree	Agree	Disagree	Strongly agree	Disagree	Agree	Agree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	relating to known	new ways	learning goals	more information	I do not attend <out-of-school time lessons> i...	I do not attend <out-of-school time lessons> i...	Less than 2 hours a week	I do not attend <out-of-school time lessons> i...	10.0	2.0	2.0	0.0	0.0	3.0	Sometimes	Sometimes	Sometimes	Sometimes	Frequently	Sometimes	Frequently	Rarely	Frequently	Heard of it often	Heard of it often	Heard of it often	Know it well, understand the concept	Heard of it a few times	Know it well, understand the concept	Never heard of it	Know it well, understand the concept	Know it well, understand the concept	Never heard of it	Know it well, understand the concept	Never heard of it	Know it well, understand the concept	Know it well, understand the concept	Heard of it often	Heard of it often	45.0	45.0	45.0	3.0	3.0	2.0	NaN	28.0	Frequently	Sometimes	Frequently	Rarely	Frequently	Frequently	Sometimes	Sometimes	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Every Lesson	NaN	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Never or Hardly Ever	Most Lessons	Every Lesson	Every Lesson	Always or almost always	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Never or rarely	Never or Hardly Ever	Never or Hardly Ever	Never or Hardly Ever	Never or Hardly Ever	NaN	NaN	NaN	Strongly agree	Strongly agree	Strongly agree	Strongly agree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	99	99	99	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	99	99	99	StQ Form C	booklet 2	Standard set of booklets	15.67	-1.0	Albania: Lower secondary education	0.31	NaN	NaN	NaN	14.21	NaN	NaN	Albania	Albania	Albania	-0.3788	NaN	1.27	1.80	NaN	NaN	0.3220	0.7955	NaN	0.7266	0.24	2.0	ISCED 5A, 6	0.04	NaN	ISCED 5A, 6	NaN	-0.73	NaN	NaN	NaN	NaN	NaN	-0.40	NaN	Native	NaN	NaN	NaN	NaN	NaN	A	ISCED level 2	General	NaN	Albanian	NaN	135.0	NaN	NaN	NaN	NaN	ISCED 3B, C	135.0	1.6748	Housewife	Cleaners and helpers in offices, hotels and ot...	NaN	17.0	16.0	NaN	Did not repeat a <grade>	0.18	90.0	NaN	NaN	0.7644	3.3108	2.3916	1.68	Albanian	NaN	NaN	NaN	-1.17	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	412.2215	498.6836	415.3373	466.7472	454.2842	538.4094	511.9255	553.9882	483.8838	479.2102	525.1675	529.0622	539.1883	516.5992	501.7993	658.3658	567.2301	669.2709	652.1343	645.1239	508.0308	522.0517	524.3885	495.5678	458.1788	524.3885	462.0735	494.0100	459.7367	471.4208	534.5147	455.8420	504.1362	454.2842	483.8838	521.2728	481.5470	503.3572	469.8629	478.4312	547.3630	481.4353	461.5776	425.0393	471.9036	438.6796	481.5740	448.9370	474.1141	426.5573	8.4871	12.7307	12.7307	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	12.7307	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	12.7307	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	4.2436	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	4.2436	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	12.7307	19	1	0.1999	22NOV13
+4	Albania	80000	ALB0006	Non-OECD	Albania	1	5	9	1.0	10	1996	Female	Yes, for more than one year	6.0	No, never	No, never	No, never	One or two times	None	2.0	Yes	Yes	Yes	NaN	NaN	NaN	She did not complete <ISCED level 1>	No	No	No	No	Working part-time <for pay>	<ISCED level 3B, 3C>	No	No	No	Yes	Working part-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	Yes	No	Yes	Yes	Yes	Yes	Yes	Yes	Yes	No	Yes	Yes	Yes	8001	8002	8001	Two	One	Two	None	One	101-200 books	Disagree	Strongly agree	Disagree	Disagree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Agree	Confident	Very confident	NaN	Very confident	Very confident	Confident	Very confident	Not very confident	Strongly agree	Strongly agree	Agree	Strongly agree	Strongly agree	Disagree	Disagree	Disagree	Agree	Agree	Strongly agree	Strongly agree	Disagree	Disagree	Strongly agree	Disagree	Likely	Likely	Likely	Likely	Slightly likely	Very Likely	Strongly agree	Strongly agree	Agree	Strongly agree	Strongly agree	Agree	Strongly agree	Strongly agree	Strongly agree	Courses after school Test Language	Major in college Math	Study harder Math	Maximum classes Math	Pursuing a career Math	Always or almost always	Always or almost always	Often	Often	Sometimes	NaN	Sometimes	Sometimes	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Every Lesson	Most Lessons	Every Lesson	Most Lessons	Some Lessons	Some Lessons	Some Lessons	Most Lessons	Some Lessons	Most Lessons	Every Lesson	Most Lessons	Every Lesson	Some Lessons	Most Lessons	Most Lessons	Every Lesson	Most Lessons	Always or almost always	Often	Sometimes	Often	Often	Often	Always or almost always	Often	Often	Some Lessons	Some Lessons	NaN	Most Lessons	Never or Hardly Ever	Strongly disagree	Disagree	Strongly agree	Strongly agree	Agree	Strongly agree	Agree	Disagree	Strongly agree	Disagree	Agree	Agree	Strongly agree	Agree	Agree	Agree	Agree	Agree	Agree	Strongly disagree	Strongly agree	Strongly agree	Strongly disagree	Strongly agree	Strongly disagree	Strongly agree	Strongly agree	Strongly agree	Disagree	Strongly disagree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Agree	Strongly agree	Strongly disagree	Agree	Strongly agree	Disagree	NaN	Mostly like me	Very much like me	Very much like me	Very much like me	Very much like me	Very much like me	Mostly like me	Very much like me	Mostly like me	definitely do this	definitely do this	definitely do this	definitely do this	1.0	2.0	1.0	2.0	1.0	2.0	1.0	1.0	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	99	99	99	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	99	99	99	StQ Form B	booklet 4	Standard set of booklets	15.50	-1.0	Albania: Lower secondary education	1.02	1.38	1.2115	2.63	80.92	NaN	-0.0784	Albania	Albania	Albania	0.5403	NaN	1.27	-0.08	NaN	NaN	NaN	NaN	0.6400	NaN	NaN	2.0	ISCED 3A, ISCED 4	-0.69	NaN	ISCED 3A, ISCED 4	NaN	-0.57	NaN	NaN	NaN	NaN	NaN	0.24	NaN	Native	NaN	NaN	NaN	1.59	0.30	A	ISCED level 2	General	NaN	Albanian	NaN	NaN	1.8169	0.41	0.6584	1.6881	None	NaN	0.6709	Housewife	Economists	1.2387	NaN	12.0	1.0819	Did not repeat a <grade>	-0.06	NaN	-0.02	2.8039	0.7644	0.9374	0.4297	0.11	Albanian	NaN	NaN	NaN	-1.17	0.6517	0.4908	0.8675	0.0505	0.4940	0.9986	0.0486	0.9341	0.4052	0.0358	0.2492	1.2260	381.9209	328.1742	403.7311	418.5309	395.1628	373.3525	293.1220	364.0053	430.2150	403.7311	414.6362	385.8155	392.8260	448.9095	474.6144	417.7520	353.1002	424.7624	457.4778	459.0357	339.0793	309.4797	340.6372	369.4579	384.2577	373.3525	392.0470	347.6476	342.1950	342.1950	432.5518	431.7729	399.0575	369.4579	341.4161	297.0167	353.8791	347.6476	314.1533	311.0375	311.7707	141.7883	293.5015	272.8495	260.1405	361.5628	275.7740	372.7527	403.5248	422.1746	8.4871	12.7307	12.7307	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	12.7307	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	12.7307	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	4.2436	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	12.7307	4.2436	4.2436	12.7307	4.2436	4.2436	4.2436	4.2436	12.7307	12.7307	4.2436	12.7307	12.7307	4.2436	4.2436	12.7307	12.7307	12.7307	12.7307	4.2436	12.7307	19	1	0.1999	22NOV13
+# check the number of countries particpating in the PISA survey
+raw_data['Country code 3-character'].nunique()
+68
+we observe that not all countries are accounted for
+# extract the 3 alphabet Country code for further use 
+raw_data['Stratum ID 7-character (cnt + region ID + original stratum ID)']= raw_data['Stratum ID 7-character (cnt + region ID + original stratum ID)'].str[0:3]
+# view al columns
+pd.options.display.max_columns = None
+raw_data.sample(5)
+x	Country code 3-character	Adjudicated sub-region code 7-digit code (3-digit country code + region ID + stratum ID)	Stratum ID 7-character (cnt + region ID + original stratum ID)	OECD country	National Centre 6-digit Code	School ID 7-digit (region ID + stratum ID + 3-digit school ID)	Student ID	International Grade	National Study Programme	Birth - Month	Birth -Year	Gender	Attend <ISCED 0>	Age at <ISCED 1>	Repeat - <ISCED 1>	Repeat - <ISCED 2>	Repeat - <ISCED 3>	Truancy - Late for School	Truancy - Skip whole school day	Truancy - Skip classes within school day	At Home - Mother	At Home - Father	At Home - Brothers	At Home - Sisters	At Home - Grandparents	At Home - Others	Mother<Highest Schooling>	Mother Qualifications - <ISCED level 6>	Mother Qualifications - <ISCED level 5A>	Mother Qualifications - <ISCED level 5B>	Mother Qualifications - <ISCED level 4>	Mother Current Job Status	Father<Highest Schooling>	Father Qualifications - <ISCED level 6>	Father Qualifications - <ISCED level 5A>	Father Qualifications - <ISCED level 5B>	Father Qualifications - <ISCED level 4>	Father Current Job Status	Country of Birth International - Self	Country of Birth International - Mother	Country of Birth International - Father	Age of arrival in <country of test>	International Language at Home	Possessions - desk	Possessions - own room	Possessions - study place	Possessions - computer	Possessions - software	Possessions - Internet	Possessions - literature	Possessions - poetry	Possessions - art	Possessions - textbooks	Possessions - <technical reference books>	Possessions - dictionary	Possessions - dishwasher	Possessions - <DVD>	Possessions - <Country item 1>	Possessions - <Country item 2>	Possessions - <Country item 3>	How many - cellular phones	How many - televisions	How many - computers	How many - cars	How many - rooms bath or shower	How many books at home	Math Interest - Enjoy Reading	Instrumental Motivation - Worthwhile for Work	Math Interest - Look Forward to Lessons	Math Interest - Enjoy Maths	Instrumental Motivation - Worthwhile for Career Chances	Math Interest - Interested	Instrumental Motivation - Important for Future Study	Instrumental Motivation - Helps to Get a Job	Subjective Norms -Friends Do Well in Mathematics	Subjective Norms -Friends Work Hard on Mathematics	Subjective Norms - Friends Enjoy Mathematics Tests	Subjective Norms - Parents Believe Studying Mathematics Is Important	Subjective Norms - Parents Believe Mathematics Is Important for Career	Subjective Norms - Parents Like Mathematics	Math Self-Efficacy - Using a <Train Timetable>	Math Self-Efficacy - Calculating TV Discount	Math Self-Efficacy - Calculating Square Metres of Tiles	Math Self-Efficacy - Understanding Graphs in Newspapers	Math Self-Efficacy - Solving Equation 1	Math Self-Efficacy - Distance to Scale	Math Self-Efficacy - Solving Equation 2	Math Self-Efficacy - Calculate Petrol Consumption Rate	Math Anxiety - Worry That It Will Be Difficult	Math Self-Concept - Not Good at Maths	Math Anxiety - Get Very Tense	Math Self-Concept- Get Good <Grades>	Math Anxiety - Get Very Nervous	Math Self-Concept - Learn Quickly	Math Self-Concept - One of Best Subjects	Math Anxiety - Feel Helpless	Math Self-Concept - Understand Difficult Work	Math Anxiety - Worry About Getting Poor <Grades>	Perceived Control - Can Succeed with Enough Effort	Perceived Control - Doing Well is Completely Up to Me	Perceived Control - Family Demands and Problems	Perceived Control - Different Teachers	Perceived Control - If I Wanted I Could Perform Well	Perceived Control - Perform Poorly Regardless	Attributions to Failure - Not Good at Maths Problems	Attributions to Failure - Teacher Did Not Explain Well	Attributions to Failure - Bad Guesses	Attributions to Failure - Material Too Hard	Attributions to Failure - Teacher Didnt Get Students Interested	Attributions to Failure - Unlucky	Math Work Ethic - Homework Completed in Time	Math Work Ethic - Work Hard on Homework	Math Work Ethic - Prepared for Exams	Math Work Ethic - Study Hard for Quizzes	Math Work Ethic - Study Until I Understand Everything	Math Work Ethic - Pay Attention in Classes	Math Work Ethic - Listen in Classes	Math Work Ethic - Avoid Distractions When Studying	Math Work Ethic - Keep Work Organized	Math Intentions - Mathematics vs. Language Courses After School	Math Intentions - Mathematics vs. Science Related Major in College	Math Intentions - Study Harder in Mathematics vs. Language Classes	Math Intentions - Take Maximum Number of Mathematics vs. Science Classes	Math Intentions - Pursuing a Career That Involves Mathematics vs. Science	Math Behaviour - Talk about Maths with Friends	Math Behaviour - Help Friends with Maths	Math Behaviour - <Extracurricular> Activity	Math Behaviour - Participate in Competitions	Math Behaviour - Study More Than 2 Extra Hours a Day	Math Behaviour - Play Chess	Math Behaviour - Computer programming	Math Behaviour - Participate in Math Club	Learning Strategies- Important Parts vs. Existing Knowledge vs. Learn by Heart	Learning Strategies- Improve Understanding vs. New Ways vs. Memory	Learning Strategies - Other Subjects vs. Learning Goals vs. Rehearse Problems	Learning Strategies - Repeat Examples vs. Everyday Applications vs. More Information	Out of school lessons - <test lang>	Out of school lessons - <maths>	Out of school lessons - <science>	Out of school lessons - other	Out-of-School Study Time - Homework	Out-of-School Study Time - Guided Homework	Out-of-School Study Time - Personal Tutor	Out-of-School Study Time - Commercial Company	Out-of-School Study Time - With Parent	Out-of-School Study Time - Computer	Experience with Applied Maths Tasks - Use <Train Timetable>	Experience with Applied Maths Tasks - Calculate Price including Tax	Experience with Applied Maths Tasks - Calculate Square Metres	Experience with Applied Maths Tasks - Understand Scientific Tables	Experience with Pure Maths Tasks - Solve Equation 1	Experience with Applied Maths Tasks - Use a Map to Calculate Distance	Experience with Pure Maths Tasks - Solve Equation 2	Experience with Applied Maths Tasks - Calculate Power Consumption Rate	Experience with Applied Maths Tasks - Solve Equation 3	Familiarity with Math Concepts - Exponential Function	Familiarity with Math Concepts - Divisor	Familiarity with Math Concepts - Quadratic Function	Overclaiming - Proper Number	Familiarity with Math Concepts - Linear Equation	Familiarity with Math Concepts - Vectors	Familiarity with Math Concepts - Complex Number	Familiarity with Math Concepts - Rational Number	Familiarity with Math Concepts - Radicals	Overclaiming - Subjunctive Scaling	Familiarity with Math Concepts - Polygon	Overclaiming - Declarative Fraction	Familiarity with Math Concepts - Congruent Figure	Familiarity with Math Concepts - Cosine	Familiarity with Math Concepts - Arithmetic Mean	Familiarity with Math Concepts - Probability	Min in <class period> - <test lang>	Min in <class period> - <Maths>	Min in <class period> - <Science>	No of <class period> p/wk - <test lang>	No of <class period> p/wk - <Maths>	No of <class period> p/wk - <Science>	No of ALL <class period> a week	Class Size - No of Students in <Test Language> Class	OTL - Algebraic Word Problem in Math Lesson	OTL - Algebraic Word Problem in Tests	OTL - Procedural Task in Math Lesson	OTL - Procedural Task in Tests	OTL - Pure Math Reasoning in Math Lesson	OTL - Pure Math Reasoning in Tests	OTL - Applied Math Reasoning in Math Lesson	OTL - Applied Math Reasoning in Tests	Math Teaching - Teacher shows interest	Math Teaching - Extra help	Math Teaching - Teacher helps	Math Teaching - Teacher continues	Math Teaching - Express opinions	Teacher-Directed Instruction - Sets Clear Goals	Teacher-Directed Instruction - Encourages Thinking and Reasoning	Student Orientation - Differentiates Between Students When Giving Tasks	Student Orientation - Assigns Complex Projects	Formative Assessment - Gives Feedback	Teacher-Directed Instruction - Checks Understanding	Student Orientation - Has Students Work in Small Groups	Teacher-Directed Instruction - Summarizes Previous Lessons	Student Orientation - Plans Classroom Activities	Formative Assessment - Gives Feedback on Strengths and Weaknesses	Formative Assessment - Informs about Expectations	Teacher-Directed Instruction - Informs about Learning Goals	Formative Assessment - Tells How to Get Better	Cognitive Activation - Teacher Encourages to Reflect Problems	Cognitive Activation - Gives Problems that Require to Think	Cognitive Activation - Asks to Use Own Procedures	Cognitive Activation - Presents Problems with No Obvious Solutions	Cognitive Activation - Presents Problems in Different Contexts	Cognitive Activation - Helps Learn from Mistakes	Cognitive Activation - Asks for Explanations	Cognitive Activation - Apply What We Learned	Cognitive Activation - Problems with Multiple Solutions	Disciplinary Climate - Students Dont Listen	Disciplinary Climate - Noise and Disorder	Disciplinary Climate - Teacher Has to Wait Until its Quiet	Disciplinary Climate - Students Dont Work Well	Disciplinary Climate - Students Start Working Late	Vignette Teacher Support -Homework Every Other Day/Back in Time	Vignette Teacher Support - Homework Once a Week/Back in Time	Vignette Teacher Support - Homework Once a Week/Not Back in Time	Teacher Support - Lets Us Know We Have to Work Hard	Teacher Support - Provides Extra Help When Needed	Teacher Support - Helps Students with Learning	Teacher Support - Gives Opportunity to Express Opinions	Vignette Classroom Management - Students Frequently Interrupt/Teacher Arrives Early	Vignette Classroom Management - Students Are Calm/Teacher Arrives on Time	Vignette Classroom Management - Students Frequently Interrupt/Teacher Arrives Late	Classroom Management - Students Listen	Classroom Management - Teacher Keeps Class Orderly	Classroom Management - Teacher Starts On Time	Classroom Management - Wait Long to <Quiet Down>	Student-Teacher Relation - Get Along with Teachers	Student-Teacher Relation - Teachers Are Interested	Student-Teacher Relation - Teachers Listen to Students	Student-Teacher Relation - Teachers Help Students	Student-Teacher Relation - Teachers Treat Students Fair	Sense of Belonging - Feel Like Outsider	Sense of Belonging - Make Friends Easily	Sense of Belonging - Belong at School	Sense of Belonging - Feel Awkward at School	Sense of Belonging - Liked by Other Students	Sense of Belonging - Feel Lonely at School	Sense of Belonging - Feel Happy at School	Sense of Belonging - Things Are Ideal at School	Sense of Belonging - Satisfied at School	Attitude towards School - Does Little to Prepare Me for Life	Attitude towards School - Waste of Time	Attitude towards School - Gave Me Confidence	Attitude towards School- Useful for Job	Attitude toward School - Helps to Get a Job	Attitude toward School - Prepare for College	Attitude toward School - Enjoy Good Grades	Attitude toward School - Trying Hard is Important	Perceived Control - Can Succeed with Enough Effort	Perceived Control - My Choice Whether I Will Be Good	Perceived Control - Problems Prevent from Putting Effort into School	Perceived Control - Different Teachers Would Make Me Try Harder	Perceived Control - Could Perform Well if I Wanted	Perceived Control - Perform Poor Regardless	Perseverance - Give up easily	Perseverance - Put off difficult problems	Perseverance - Remain interested	Perseverance - Continue to perfection	Perseverance - Exceed expectations	Openness for Problem Solving - Can Handle a Lot of Information	Openness for Problem Solving - Quick to Understand	Openness for Problem Solving - Seek Explanations	Openness for Problem Solving - Can Link Facts	Openness for Problem Solving - Like to Solve Complex Problems	Problem Text Message - Press every button	Problem Text Message - Trace steps	Problem Text Message - Manual	Problem Text Message - Ask a friend	Problem Route Selection - Read brochure	Problem Route Selection - Study map	Problem Route Selection - Leave it to brother	Problem Route Selection - Just drive	Problem Ticket Machine - Similarities	Problem Ticket Machine - Try buttons	Problem Ticket Machine - Ask for help	Problem Ticket Machine - Find ticket office	At Home - Desktop Computer	At Home - Portable laptop	At Home - Tablet computer	At Home - Internet connection	At Home - Video games console	At Home - Cell phone w/o Internet	At Home - Cell phone with Internet	At Home - Mp3/Mp4 player	At Home - Printer	At Home - USB (memory) stick	At Home - Ebook reader	At school - Desktop Computer	At school - Portable laptop	At school - Tablet computer	At school - Internet connection	At school - Printer	At school - USB (memory) stick	At school - Ebook reader	First use of computers	First access to Internet	Internet at School	Internet out-of-school - Weekday	Internet out-of-school - Weekend	Out-of-school 8 - One player games.	Out-of-school 8 - ColLabourative games.	Out-of-school 8 - Use email	Out-of-school 8 - Chat on line	Out-of-school 8 - Social networks	Out-of-school 8 - Browse the Internet for fun	Out-of-school 8 - Read news	Out-of-school 8 - Obtain practical information from the Internet	Out-of-school 8 - Download music	Out-of-school 8 - Upload content	Out-of-school 9 - Internet for school	Out-of-school 9 - Email students	Out-of-school 9 - Email teachers	Out-of-school 9 - Download from School	Out-of-school 9 - Announcements	Out-of-school 9 - Homework	Out-of-school 9 - Share school material	At School - Chat on line	At School - Email	At School - Browse for schoolwork	At School - Download from website	At School - Post on website	At School - Simulations	At School - Practice and drilling	At School - Homework	At School - Group work	Maths lessons - Draw graph	Maths lessons - Calculation with numbers	Maths lessons - Geometric figures	Maths lessons - Spreadsheet	Maths lessons - Algebra	Maths lessons - Histograms	Maths lessons - Change in graphs	Attitudes - Useful for schoolwork	Attitudes - Homework more fun	Attitudes - Source of information	Attitudes - Troublesome	Attitudes - Not suitable for schoolwork	Attitudes - Too unreliable	Miss 2 months of <ISCED 1>	Miss 2 months of <ISCED 2>	Future Orientation - Internship	Future Orientation - Work-site visits	Future Orientation - Job fair	Future Orientation - Career advisor at school	Future Orientation - Career advisor outside school	Future Orientation - Questionnaire	Future Orientation - Internet search	Future Orientation - Tour<ISCED 3-5> institution	Future Orientation - web search <ISCED 3-5> prog	Future Orientation - <country specific item>	Acquired skills - Find job info - Yes, at school	Acquired skills - Find job info - Yes, out of school	Acquired skills - Find job info - No, never	Acquired skills - Search for job - Yes, at school	Acquired skills - Search for job - Yes, out of school	Acquired skills - Search for job - No, never	Acquired skills - Write resume - Yes, at school	Acquired skills - Write resume - Yes, out of school	Acquired skills - Write resume - No, never	Acquired skills - Job interview - Yes, at school	Acquired skills - Job interview - Yes, out of school	Acquired skills - Job interview - No, never	Acquired skills - ISCED 3-5 programs - Yes, at school	Acquired skills - ISCED 3-5 programs - Yes, out of school	Acquired skills - ISCED 3-5 programs - No, never	Acquired skills - Student financing - Yes, at school	Acquired skills - Student financing - Yes, out of school	Acquired skills - Student financing - No, never	First language learned	Age started learning <test language>	Language spoken - Mother	Language spoken - Father	Language spoken - Siblings	Language spoken - Best friend	Language spoken - Schoolmates	Activities language - Reading	Activities language - Watching TV	Activities language - Internet surfing	Activities language - Writing emails	Types of support <test language> - remedial lessons	Amount of support <test language>	Attend lessons <heritage language> - focused	Attend lessons <heritage language> - school subjects	Instruction in <heritage language>	Acculturation - Mother Immigrant (Filter)	Acculturation - Enjoy <Host Culture> Friends	Acculturation - Enjoy <Heritage Culture> Friends	Acculturation - Enjoy <Host Culture> Celebrations	Acculturation - Enjoy <Heritage Culture> Celebrations	Acculturation - Spend Time with <Host Culture> Friends	Acculturation - Spend Time with <Heritage Culture> Friends	Acculturation - Participate in <Host Culture> Celebrations	Acculturation - Participate in <Heritage Culture> Celebrations	Acculturation - Perceived Host-Heritage Cultural Differences - Values	Acculturation - Perceived Host-Heritage Cultural Differences - Mother Treatment	Acculturation - Perceived Host-Heritage Cultural Differences - Teacher Treatment	Calculator Use	Effort-real 1	Effort-real 2	Difference in Effort	Student Questionnaire Form	Booklet ID	Standard or simplified set of booklets	Age of student	Grade compared to modal grade in country	Unique national study programme code	Mathematics Anxiety	Attitude towards School: Learning Outcomes	Attitude towards School: Learning Activities	Sense of Belonging to School	Father SQ ISEI	Mother SQ ISEI	Mathematics Teacher's Classroom Management	Country of Birth National Categories- Father	Country of Birth National Categories- Mother	Country of Birth National Categories- Self	Cognitive Activation in Mathematics Lessons	Cultural Distance between Host and Heritage Culture	Cultural Possessions	Disciplinary Climate	ICT Entertainment Use	Index of economic, social and cultural status	Experience with Applied Mathematics Tasks at School	Experience with Pure Mathematics Tasks at School	Attributions to Failure in Mathematics	Familiarity with Mathematical Concepts	Familiarity with Mathematical Concepts (Signal Detection Adjusted)	Family Structure	Educational level of father (ISCED)	Home educational resources	Acculturation: Heritage Culture Oriented Strategies	Highest educational level of parents	Highest parental occupational status	Home Possessions	ICT Use at Home for School-related Tasks	Acculturation: Host Culture Oriented Strategies	Attitudes Towards Computers: Limitations of the Computer as a Tool for School Learning	Attitudes Towards Computers: Computer as a Tool for School Learning	ICT Availability at Home	ICT resources	ICT Availability at School	Immigration status	Information about Careers	Information about the Labour Market provided by the School	Information about the Labour Market provided outside of School	Instrumental Motivation for Mathematics	Mathematics Interest	ISCED designation	ISCED level	ISCED orientation	Preference for Heritage Language in Conversations with Family and Friends	Language at home (3-digit code)	Preference for Heritage Language in Language Reception and Production	Learning time (minutes per week) - <test language>	Mathematics Behaviour	Mathematics Self-Efficacy	Mathematics Intentions	Mathematics Work Ethic	Educational level of mother (ISCED)	Learning time (minutes per week)- <Mathematics>	Mathematics Teacher's Support	ISCO-08 Occupation code - Mother	ISCO-08 Occupation code - Father	Openness for Problem Solving	Out-of-School Study Time	Highest parental education in years	Perseverance	Grade Repetition	Mathematics Self-Concept	Learning time (minutes per week) - <Science>	Teacher Student Relations	Subjective Norms in Mathematics	Teacher Behaviour: Formative Assessment	Teacher Behaviour: Student Orientation	Teacher Behaviour: Teacher-directed Instruction	Teacher Support	Language of the test	Time of computer use (mins)	Use of ICT in Mathematic Lessons	Use of ICT at School	Wealth	Attitude towards School: Learning Outcomes (Anchored)	Attitude towards School: Learning Activities (Anchored)	Sense of Belonging to School (Anchored)	Mathematics Teacher's Classroom Management (Anchored)	Cognitive Activation in Mathematics Lessons (Anchored)	Instrumental Motivation for Mathematics (Anchored)	Mathematics Interest (Anchored)	Mathematics Work Ethic (Anchored)	Mathematics Teacher's Support (Anchored)	Mathematics Self-Concept (Anchored)	Teacher Student Relations (Anchored)	Subjective Norms in Mathematics (Anchored)	Plausible value 1 in mathematics	Plausible value 2 in mathematics	Plausible value 3 in mathematics	Plausible value 4 in mathematics	Plausible value 5 in mathematics	Plausible value 1 in content subscale of math - Change and Relationships	Plausible value 2 in content subscale of math - Change and Relationships	Plausible value 3 in content subscale of math - Change and Relationships	Plausible value 4 in content subscale of math - Change and Relationships	Plausible value 5 in content subscale of math - Change and Relationships	Plausible value 1 in content subscale of math - Quantity	Plausible value 2 in content subscale of math - Quantity	Plausible value 3 in content subscale of math - Quantity	Plausible value 4 in content subscale of math - Quantity	Plausible value 5 in content subscale of math - Quantity	Plausible value 1 in content subscale of math - Space and Shape	Plausible value 2 in content subscale of math - Space and Shape	Plausible value 3 in content subscale of math - Space and Shape	Plausible value 4 in content subscale of math - Space and Shape	Plausible value 5 in content subscale of math - Space and Shape	Plausible value 1 in content subscale of math - Uncertainty and Data	Plausible value 2 in content subscale of math - Uncertainty and Data	Plausible value 3 in content subscale of math - Uncertainty and Data	Plausible value 4 in content subscale of math - Uncertainty and Data	Plausible value 5 in content subscale of math - Uncertainty and Data	Plausible value 1 in process subscale of math - Employ	Plausible value 2 in process subscale of math - Employ	Plausible value 3 in process subscale of math - Employ	Plausible value 4 in process subscale of math - Employ	Plausible value 5 in process subscale of math - Employ	Plausible value 1 in process subscale of math - Formulate	Plausible value 2 in process subscale of math - Formulate	Plausible value 3 in process subscale of math - Formulate	Plausible value 4 in process subscale of math - Formulate	Plausible value 5 in process subscale of math - Formulate	Plausible value 1 in process subscale of math - Interpret	Plausible value 2 in process subscale of math - Interpret	Plausible value 3 in process subscale of math - Interpret	Plausible value 4 in process subscale of math - Interpret	Plausible value 5 in process subscale of math - Interpret	Plausible value 1 in reading	Plausible value 2 in reading	Plausible value 3 in reading	Plausible value 4 in reading	Plausible value 5 in reading	Plausible value 1 in science	Plausible value 2 in science	Plausible value 3 in science	Plausible value 4 in science	Plausible value 5 in science	FINAL STUDENT WEIGHT	FINAL STUDENT REPLICATE BRR-FAY WEIGHT1	FINAL STUDENT REPLICATE BRR-FAY WEIGHT2	FINAL STUDENT REPLICATE BRR-FAY WEIGHT3	FINAL STUDENT REPLICATE BRR-FAY WEIGHT4	FINAL STUDENT REPLICATE BRR-FAY WEIGHT5	FINAL STUDENT REPLICATE BRR-FAY WEIGHT6	FINAL STUDENT REPLICATE BRR-FAY WEIGHT7	FINAL STUDENT REPLICATE BRR-FAY WEIGHT8	FINAL STUDENT REPLICATE BRR-FAY WEIGHT9	FINAL STUDENT REPLICATE BRR-FAY WEIGHT10	FINAL STUDENT REPLICATE BRR-FAY WEIGHT11	FINAL STUDENT REPLICATE BRR-FAY WEIGHT12	FINAL STUDENT REPLICATE BRR-FAY WEIGHT13	FINAL STUDENT REPLICATE BRR-FAY WEIGHT14	FINAL STUDENT REPLICATE BRR-FAY WEIGHT15	FINAL STUDENT REPLICATE BRR-FAY WEIGHT16	FINAL STUDENT REPLICATE BRR-FAY WEIGHT17	FINAL STUDENT REPLICATE BRR-FAY WEIGHT18	FINAL STUDENT REPLICATE BRR-FAY WEIGHT19	FINAL STUDENT REPLICATE BRR-FAY WEIGHT20	FINAL STUDENT REPLICATE BRR-FAY WEIGHT21	FINAL STUDENT REPLICATE BRR-FAY WEIGHT22	FINAL STUDENT REPLICATE BRR-FAY WEIGHT23	FINAL STUDENT REPLICATE BRR-FAY WEIGHT24	FINAL STUDENT REPLICATE BRR-FAY WEIGHT25	FINAL STUDENT REPLICATE BRR-FAY WEIGHT26	FINAL STUDENT REPLICATE BRR-FAY WEIGHT27	FINAL STUDENT REPLICATE BRR-FAY WEIGHT28	FINAL STUDENT REPLICATE BRR-FAY WEIGHT29	FINAL STUDENT REPLICATE BRR-FAY WEIGHT30	FINAL STUDENT REPLICATE BRR-FAY WEIGHT31	FINAL STUDENT REPLICATE BRR-FAY WEIGHT32	FINAL STUDENT REPLICATE BRR-FAY WEIGHT33	FINAL STUDENT REPLICATE BRR-FAY WEIGHT34	FINAL STUDENT REPLICATE BRR-FAY WEIGHT35	FINAL STUDENT REPLICATE BRR-FAY WEIGHT36	FINAL STUDENT REPLICATE BRR-FAY WEIGHT37	FINAL STUDENT REPLICATE BRR-FAY WEIGHT38	FINAL STUDENT REPLICATE BRR-FAY WEIGHT39	FINAL STUDENT REPLICATE BRR-FAY WEIGHT40	FINAL STUDENT REPLICATE BRR-FAY WEIGHT41	FINAL STUDENT REPLICATE BRR-FAY WEIGHT42	FINAL STUDENT REPLICATE BRR-FAY WEIGHT43	FINAL STUDENT REPLICATE BRR-FAY WEIGHT44	FINAL STUDENT REPLICATE BRR-FAY WEIGHT45	FINAL STUDENT REPLICATE BRR-FAY WEIGHT46	FINAL STUDENT REPLICATE BRR-FAY WEIGHT47	FINAL STUDENT REPLICATE BRR-FAY WEIGHT48	FINAL STUDENT REPLICATE BRR-FAY WEIGHT49	FINAL STUDENT REPLICATE BRR-FAY WEIGHT50	FINAL STUDENT REPLICATE BRR-FAY WEIGHT51	FINAL STUDENT REPLICATE BRR-FAY WEIGHT52	FINAL STUDENT REPLICATE BRR-FAY WEIGHT53	FINAL STUDENT REPLICATE BRR-FAY WEIGHT54	FINAL STUDENT REPLICATE BRR-FAY WEIGHT55	FINAL STUDENT REPLICATE BRR-FAY WEIGHT56	FINAL STUDENT REPLICATE BRR-FAY WEIGHT57	FINAL STUDENT REPLICATE BRR-FAY WEIGHT58	FINAL STUDENT REPLICATE BRR-FAY WEIGHT59	FINAL STUDENT REPLICATE BRR-FAY WEIGHT60	FINAL STUDENT REPLICATE BRR-FAY WEIGHT61	FINAL STUDENT REPLICATE BRR-FAY WEIGHT62	FINAL STUDENT REPLICATE BRR-FAY WEIGHT63	FINAL STUDENT REPLICATE BRR-FAY WEIGHT64	FINAL STUDENT REPLICATE BRR-FAY WEIGHT65	FINAL STUDENT REPLICATE BRR-FAY WEIGHT66	FINAL STUDENT REPLICATE BRR-FAY WEIGHT67	FINAL STUDENT REPLICATE BRR-FAY WEIGHT68	FINAL STUDENT REPLICATE BRR-FAY WEIGHT69	FINAL STUDENT REPLICATE BRR-FAY WEIGHT70	FINAL STUDENT REPLICATE BRR-FAY WEIGHT71	FINAL STUDENT REPLICATE BRR-FAY WEIGHT72	FINAL STUDENT REPLICATE BRR-FAY WEIGHT73	FINAL STUDENT REPLICATE BRR-FAY WEIGHT74	FINAL STUDENT REPLICATE BRR-FAY WEIGHT75	FINAL STUDENT REPLICATE BRR-FAY WEIGHT76	FINAL STUDENT REPLICATE BRR-FAY WEIGHT77	FINAL STUDENT REPLICATE BRR-FAY WEIGHT78	FINAL STUDENT REPLICATE BRR-FAY WEIGHT79	FINAL STUDENT REPLICATE BRR-FAY WEIGHT80	RANDOMIZED FINAL VARIANCE STRATUM (1-80)	RANDOMLY ASSIGNED VARIANCE UNIT	Senate weight - sum of weight within the country is 1000	Date of the database creation
+324126	Mexico	4840000	MEX	OECD	Mexico	370	8424	10	7.0	3	1996	Male	Yes, for more than one year	6.0	No, never	No, never	No, never	None	None	1.0	No	No	No	No	No	Yes	<ISCED level 1>	NaN	NaN	NaN	NaN	NaN	<ISCED level 1>	NaN	NaN	NaN	NaN	Working part-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	Yes	Yes	No	No	No	Yes	No	No	No	No	Yes	No	Yes	484002	484001	484002	One	One	NaN	NaN	None	11-25 books	Agree	Strongly agree	Agree	Agree	Agree	Agree	Agree	Strongly agree	Agree	Disagree	Disagree	Agree	Agree	Agree	Confident	Confident	Not very confident	Not very confident	Confident	Not very confident	Confident	Not very confident	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Strongly agree	Agree	Agree	Disagree	Agree	Agree	Likely	Likely	NaN	Slightly likely	Slightly likely	Slightly likely	Agree	Agree	Agree	Agree	Agree	Agree	Agree	Agree	Agree	Courses after school Math	Major in college Math	Study harder Math	Maximum classes Math	Pursuing a career Math	Sometimes	Often	Sometimes	Sometimes	Sometimes	Never or rarely	Never or rarely	Never or rarely	Most important	new ways	Relating to other subjects	everyday life	4 or more but less than 6 hours a week	4 or more but less than 6 hours a week	I do not attend <out-of-school time lessons> i...	Less than 2 hours a week	3.0	NaN	0.0	0.0	1.0	2.0	Sometimes	Rarely	Never	Rarely	Frequently	Sometimes	Frequently	Never	Frequently	Heard of it a few times	Heard of it a few times	Heard of it a few times	Heard of it a few times	Never heard of it	Never heard of it	Never heard of it	Heard of it once or twice	Heard of it once or twice	Never heard of it	Heard of it a few times	Heard of it once or twice	Never heard of it	Heard of it a few times	Heard of it once or twice	Heard of it a few times	60.0	60.0	NaN	4.0	6.0	2.0	30.0	50.0	Sometimes	Sometimes	Sometimes	Sometimes	Frequently	Sometimes	Frequently	Sometimes	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Somewhat like me	Not much like me	Somewhat like me	Somewhat like me	Somewhat like me	Not much like me	Somewhat like me	Somewhat like me	Not much like me	Somewhat like me	definitely do this	probably do this	definitely do this	definitely do this	1.0	2.0	1.0	2.0	1.0	2.0	2.0	1.0	No	No	No	Yes, but I dont use it	Yes, but I dont use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, but I dont use it	Yes, and I use it	Yes, but I dont use it	No	No	No	No	Yes, and I use it	Yes, and I use it	Yes, and I use it	7-9 years old	13 years old or older	2	7	6	Once or twice a month	Once or twice a month	Once or twice a month	Once or twice a month	Never or hardly ever	Once or twice a month	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Yes, but only the teacher demonstrated this	Yes, but only the teacher demonstrated this	Yes, but only the teacher demonstrated this	Yes, but only the teacher demonstrated this	Yes, but only the teacher demonstrated this	Yes, but only the teacher demonstrated this	Yes, but only the teacher demonstrated this	Agree	Agree	Agree	Agree	Agree	Agree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	No calculator	10	10	0	StQ Form A	booklet 23	Easier set of booklets	16.00	0.0	Mexico: Technical Baccalaureate or Technical f...	NaN	NaN	NaN	NaN	12.34	NaN	NaN	Mexico	Mexico	Mexico	NaN	NaN	-0.48	NaN	-1.5967	-2.82	-0.6251	0.7955	-0.2626	-0.9054	-0.82	3.0	ISCED 1	-1.80	NaN	ISCED 1	12.34	-2.71	-2.4442	NaN	1.0091	-0.5096	-0.6891	-2.47	-0.0836	Native	NaN	NaN	NaN	0.80	0.91	A	ISCED level 3	Vocational	NaN	Spanish	NaN	240.0	0.6426	-0.77	1.4565	0.2882	ISCED 1	360.0	NaN	Housewife	Fishery and aquaculture labourers	-0.9492	6.0	6.0	-0.1475	Did not repeat a <grade>	NaN	NaN	NaN	-0.0455	NaN	NaN	NaN	NaN	Spanish	114.0	1.0032	-1.6104	-2.75	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	466.4356	443.0675	476.5618	434.4991	469.5513	497.5931	414.2468	495.2563	414.2468	450.8568	452.4147	392.4365	430.6045	419.6993	405.6785	535.7610	498.3720	520.9612	504.6035	529.5295	450.8568	453.1936	445.4043	427.4887	462.5409	386.2050	493.6984	427.4887	448.5200	448.5200	443.8464	534.9821	500.7088	484.3511	503.0456	392.4365	500.7088	394.7733	450.0779	431.3834	406.4075	404.8036	408.0114	428.0600	313.3819	424.9720	427.7695	454.8116	427.7695	470.6639	45.3585	67.5590	69.9091	67.1650	70.1362	67.2642	67.9730	68.4704	67.8850	70.3181	69.9456	67.5336	70.0687	70.0249	67.8676	68.1256	70.8543	69.3333	70.2489	69.2551	67.6973	22.0079	22.8596	22.1369	22.7873	22.1066	21.8742	21.7175	21.9027	22.7283	22.8493	22.0167	22.8091	22.8241	21.9066	21.8247	22.5586	23.0535	22.7504	23.0794	21.9634	67.5590	69.9091	67.1650	70.1362	67.2642	67.9730	68.4704	67.8850	70.3181	69.9456	67.5336	70.0687	70.0249	67.8676	68.1256	70.8543	69.3333	70.2489	69.2551	67.6973	22.0079	22.8596	22.1369	22.7873	22.1066	21.8742	21.7175	21.9027	22.7283	22.8493	22.0167	22.8091	22.8241	21.9066	21.8247	22.5586	23.0535	22.7504	23.0794	21.9634	9	1	0.0342	22NOV13
+468383	Turkey	7920000	TUR	OECD	Turkey	106	2994	10	3.0	4	1996	Male	No	6.0	No, never	NaN	No, never	One or two times	None	2.0	Yes	Yes	Yes	Yes	NaN	NaN	She did not complete <ISCED level 1>	No	No	No	NaN	Other (e.g. home duties, retired)	<ISCED level 1>	No	No	No	NaN	Other (e.g. home duties, retired)	Country of test	Country of test	Country of test	NaN	Other language	No	No	Yes	No	No	No	No	Yes	No	Yes	No	Yes	No	No	792002	792002	792002	One	One	None	None	One	11-25 books	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Agree	Disagree	Agree	Disagree	Agree	Disagree	Disagree	Agree	Disagree	Agree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Most important	Improve understanding	learning goals	everyday life	I do not attend <out-of-school time lessons> i...	I do not attend <out-of-school time lessons> i...	I do not attend <out-of-school time lessons> i...	I do not attend <out-of-school time lessons> i...	3.0	1.0	0.0	0.0	1.0	0.0	Never	Rarely	Rarely	Rarely	Frequently	Rarely	Frequently	Sometimes	Frequently	Heard of it often	Know it well, understand the concept	Heard of it often	Heard of it once or twice	Heard of it often	Know it well, understand the concept	Heard of it a few times	Heard of it often	Heard of it often	Never heard of it	Heard of it often	Heard of it once or twice	Heard of it once or twice	Know it well, understand the concept	Know it well, understand the concept	Know it well, understand the concept	40.0	40.0	40.0	5.0	4.0	4.0	40.0	15.0	Sometimes	Sometimes	Frequently	Frequently	Frequently	Frequently	Sometimes	Sometimes	Most Lessons	Every Lesson	Every Lesson	Every Lesson	Every Lesson	Most Lessons	Most Lessons	Every Lesson	Some Lessons	Never or Hardly Ever	Some Lessons	Some Lessons	Some Lessons	Never or Hardly Ever	Some Lessons	Most Lessons	Every Lesson	Some Lessons	Sometimes	Often	Often	Often	Sometimes	Always or almost always	Often	Always or almost always	Often	Never or Hardly Ever	Never or Hardly Ever	Some Lessons	Some Lessons	Some Lessons	Agree	Agree	Disagree	Agree	Agree	Agree	Agree	Agree	Strongly agree	Strongly disagree	Strongly agree	Agree	Strongly agree	Disagree	Agree	Agree	Agree	Agree	Agree	Disagree	Strongly agree	Agree	Agree	Agree	Strongly disagree	Agree	Strongly agree	Strongly agree	Agree	Agree	Disagree	Agree	Agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly disagree	Disagree	Strongly agree	Strongly disagree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	No	No	No	No	No	Yes, and I use it	No	No	No	No	No	No	No	No	No	No	No	No	Never	NaN	99	99	99	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	10	10	0	StQ Form C	booklet 6	Standard set of booklets	16.00	0.0	Turkey: Anatolian high school	0.79	-1.22	0.5206	0.32	11.56	NaN	0.7640	Turkey	Turkey	Turkey	0.3891	NaN	-0.48	0.49	NaN	-3.16	-0.6251	0.7955	NaN	0.7266	0.85	2.0	ISCED 1	-1.80	NaN	ISCED 1	11.56	-3.23	NaN	NaN	NaN	NaN	-2.7874	-3.16	-2.8038	Native	NaN	NaN	NaN	NaN	NaN	A	ISCED level 3	General	NaN	Another language (TUR)	NaN	200.0	NaN	NaN	NaN	NaN	None	160.0	-0.2395	Housewife	Field crop and vegetable growers	NaN	5.0	5.0	NaN	Did not repeat a <grade>	-0.29	160.0	-0.02	NaN	-0.2859	0.7183	-0.0798	0.97	Turkish	NaN	NaN	NaN	-3.73	-0.4110	0.0309	0.0501	0.2299	0.2717	NaN	NaN	NaN	-0.1687	0.0358	-0.1113	NaN	433.2528	455.0631	435.5897	410.6637	435.5897	451.1684	417.6741	419.2320	409.8847	414.5583	436.3686	392.7481	429.3582	416.1162	419.2320	522.8307	437.9265	469.0840	482.3259	485.4417	456.6210	448.0527	436.3686	438.7054	435.5897	441.0422	465.1893	458.9578	423.1267	424.6845	399.7585	419.2320	400.5375	392.7481	392.7481	375.6115	401.3164	430.9160	399.7585	368.6010	445.8632	489.1682	448.2690	416.1912	455.4865	493.0436	496.7736	429.6345	424.0395	463.2040	180.7862	308.6213	52.9510	308.6213	308.6213	308.6213	308.6213	52.9510	52.9510	308.6213	52.9510	52.9510	308.6213	308.6213	52.9510	52.9510	52.9510	52.9510	308.6213	52.9510	308.6213	308.6213	52.9510	308.6213	308.6213	308.6213	308.6213	52.9510	52.9510	308.6213	52.9510	52.9510	308.6213	308.6213	52.9510	52.9510	52.9510	52.9510	308.6213	52.9510	308.6213	52.9510	308.6213	52.9510	52.9510	52.9510	52.9510	308.6213	308.6213	52.9510	308.6213	308.6213	52.9510	52.9510	308.6213	308.6213	308.6213	308.6213	52.9510	308.6213	52.9510	52.9510	308.6213	52.9510	52.9510	52.9510	52.9510	308.6213	308.6213	52.9510	308.6213	308.6213	52.9510	52.9510	308.6213	308.6213	308.6213	308.6213	52.9510	308.6213	52.9510	42	1	0.2086	22NOV13
+146667	Spain	7240200	ESP	OECD	Spain	38	1085	10	1.0	6	1996	Male	Yes, for more than one year	6.0	No, never	No, never	NaN	None	None	2.0	Yes	Yes	No	No	No	No	<ISCED level 2>	No	No	No	Yes	Other (e.g. home duties, retired)	NaN	No	No	No	Yes	Working full-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	Yes	Yes	Yes	No	Yes	Yes	Yes	Yes	No	No	Yes	Yes	Yes	724001	724001	724001	Three or more	Three or more	One	Two	Two	101-200 books	Strongly disagree	Disagree	Disagree	Disagree	Agree	Disagree	Disagree	Agree	Disagree	Disagree	Strongly disagree	Strongly agree	Agree	Agree	Not very confident	Confident	Confident	Confident	Very confident	Not very confident	Very confident	Very confident	Disagree	Agree	Disagree	Agree	Disagree	Disagree	Disagree	Disagree	Disagree	Agree	Agree	Agree	Disagree	Disagree	Agree	Disagree	Likely	Slightly likely	Slightly likely	Likely	Likely	Slightly likely	Agree	Disagree	Disagree	Agree	Disagree	Agree	Agree	Agree	Agree	Courses after school Math	Major in college Science	Study harder Test Language	Maximum classes Science	Pursuing a career Science	Never or rarely	Sometimes	Sometimes	Never or rarely	Never or rarely	Never or rarely	Never or rarely	Never or rarely	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Most Lessons	Most Lessons	Most Lessons	Most Lessons	Some Lessons	Most Lessons	Some Lessons	Every Lesson	Some Lessons	Some Lessons	Most Lessons	Never or Hardly Ever	Some Lessons	Never or Hardly Ever	Never or Hardly Ever	Some Lessons	Every Lesson	Most Lessons	Often	Sometimes	Sometimes	Often	Sometimes	Sometimes	Never or rarely	Always or almost always	Always or almost always	Some Lessons	Most Lessons	Every Lesson	Some Lessons	Some Lessons	Agree	Disagree	Strongly disagree	Agree	Strongly agree	Strongly agree	Agree	Strongly disagree	Strongly agree	Disagree	Strongly agree	Strongly agree	Strongly agree	Agree	Disagree	Agree	Strongly agree	Strongly agree	Strongly agree	Strongly disagree	Strongly agree	Strongly agree	Strongly disagree	Strongly agree	Strongly disagree	Strongly agree	Strongly agree	Strongly agree	Disagree	Disagree	Agree	Agree	Strongly agree	Strongly agree	Agree	Agree	Agree	Agree	Disagree	Disagree	Agree	Disagree	Not much like me	Not at all like me	Very much like me	Mostly like me	Mostly like me	Mostly like me	Mostly like me	Mostly like me	Mostly like me	Not much like me	definitely not do this	probably do this	probably not do this	probably do this	2.0	2.0	3.0	2.0	3.0	3.0	2.0	2.0	Yes, and I use it	Yes, and I use it	No	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	No	Yes, and I use it	Yes, but I dont use it	Yes, but I dont use it	Yes, and I use it	Yes, but I dont use it	Yes, and I use it	No	7-9 years old	7-9 years old	1	4	5	Once or twice a week	Once or twice a week	Once or twice a month	Every day	Every day	Every day	Once or twice a month	Once or twice a month	Every day	Almost every day	Once or twice a month	Once or twice a month	Once or twice a month	Once or twice a month	Once or twice a month	Once or twice a month	Once or twice a month	Never or hardly ever	Never or hardly ever	Once or twice a month	Never or hardly ever	Once or twice a month	Once or twice a month	Never or hardly ever	Never or hardly ever	Never or hardly ever	No	Yes, but only the teacher demonstrated this	No	Yes, students did this	No	Yes, students did this	No	Agree	Agree	Agree	Agree	Agree	Strongly agree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	A Scientific calculator	3	8	5	StQ Form B	booklet 11	Standard set of booklets	15.92	0.0	Spain: Compulsory Secondary Education	-0.20	-0.24	0.0873	2.63	25.95	27.91	0.7640	Aragon (ESP)	Aragon (ESP)	Aragon (ESP)	-0.1777	NaN	1.27	-0.71	0.5490	-0.55	NaN	NaN	-0.0760	NaN	NaN	2.0	ISCED 3A, ISCED 4	-1.29	NaN	ISCED 3A, ISCED 4	27.91	0.40	0.0526	NaN	1.3219	-0.5096	0.7157	-1.13	0.8574	Native	NaN	NaN	NaN	-0.67	-0.66	A	ISCED level 2	General	NaN	Spanish	NaN	NaN	-0.4567	-0.02	-0.7332	-0.2356	ISCED 3A, ISCED 4	NaN	0.6709	Elementary workers not elsewhere classified	Heavy truck and lorry drivers	0.0521	NaN	12.0	1.3116	Did not repeat a <grade>	-0.29	NaN	0.81	-0.3852	-0.2859	0.4855	-0.0798	-0.28	Spanish	39.0	0.7306	-0.1388	0.45	-2.7779	-1.8911	-0.9890	-0.9781	-1.8184	-2.2172	-1.6958	-2.7430	-1.5787	-2.0134	-1.3056	-2.1828	544.4072	509.3550	554.5334	515.5865	540.5125	555.3124	538.1757	524.1549	552.1966	571.6700	549.8598	539.7336	521.0391	553.7545	558.4281	496.8920	522.5970	498.4499	478.1975	501.5657	603.6065	559.9860	560.7649	592.7014	592.7014	553.7545	533.5021	529.6074	538.9547	531.9442	539.7336	554.5334	525.7127	547.5230	549.8598	554.5334	559.2070	556.8702	568.5543	565.4385	530.7892	560.4612	534.7989	475.4550	547.6300	589.0899	595.6173	606.8072	543.3980	603.0772	7.1233	10.6850	10.6850	3.5617	10.6850	10.6850	10.6850	10.6850	3.5617	3.5617	10.6850	3.5617	3.5617	10.6850	10.6850	3.5617	3.5617	3.5617	3.5617	10.6850	3.5617	3.5617	3.5617	10.6850	3.5617	3.5617	3.5617	3.5617	10.6850	10.6850	3.5617	10.6850	10.6850	3.5617	3.5617	10.6850	10.6850	10.6850	10.6850	3.5617	10.6850	10.6850	10.6850	3.5617	10.6850	10.6850	10.6850	10.6850	3.5617	3.5617	10.6850	3.5617	3.5617	10.6850	10.6850	3.5617	3.5617	3.5617	3.5617	10.6850	3.5617	3.5617	3.5617	10.6850	3.5617	3.5617	3.5617	3.5617	10.6850	10.6850	3.5617	10.6850	10.6850	3.5617	3.5617	10.6850	10.6850	10.6850	10.6850	3.5617	10.6850	29	1	0.0191	22NOV13
+127931	Czech Republic	2030000	CZE	OECD	Czech Republic	11	158	9	1.0	7	1996	Male	Yes, for one year or less	7.0	No, never	No, never	NaN	None	None	1.0	Yes	Yes	Yes	Yes	No	No	<ISCED level 3B, 3C>	No	No	No	Yes	Working full-time <for pay>	<ISCED level 3B, 3C>	No	No	No	Yes	Working full-time <for pay>	Country of test	Country of test	Country of test	NaN	Language of the test	Yes	Yes	Yes	Yes	No	Yes	No	No	No	No	Yes	Yes	Yes	Yes	203001	203001	203001	Three or more	Three or more	Two	Two	One	0-10 books	Strongly disagree	Strongly agree	Disagree	Disagree	Strongly disagree	Agree	Strongly agree	Strongly disagree	Disagree	Disagree	Disagree	Strongly agree	Strongly agree	Strongly disagree	Confident	Very confident	Not very confident	Very confident	Very confident	Not very confident	Very confident	Very confident	Strongly disagree	Strongly disagree	Strongly disagree	Disagree	Strongly disagree	Agree	Strongly disagree	Disagree	Disagree	Strongly disagree	Strongly agree	Strongly agree	Strongly disagree	Strongly disagree	Agree	Strongly disagree	Not at all likely	Not at all likely	Not at all likely	Very Likely	Likely	Not at all likely	Strongly disagree	Strongly disagree	Strongly agree	Strongly agree	Disagree	Strongly disagree	Strongly disagree	Disagree	Strongly agree	Courses after school Test Language	Major in college Science	Study harder Test Language	Maximum classes Science	Pursuing a career Science	Never or rarely	Never or rarely	Never or rarely	Never or rarely	Never or rarely	Sometimes	Always or almost always	Never or rarely	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Every Lesson	Some Lessons	Most Lessons	Some Lessons	Never or Hardly Ever	Every Lesson	Every Lesson	Never or Hardly Ever	Every Lesson	Some Lessons	Every Lesson	Most Lessons	Some Lessons	Every Lesson	Most Lessons	Every Lesson	Every Lesson	Every Lesson	Always or almost always	Always or almost always	Always or almost always	Never or rarely	Often	Sometimes	Always or almost always	Always or almost always	Often	Every Lesson	Never or Hardly Ever	Never or Hardly Ever	Some Lessons	Never or Hardly Ever	Disagree	Disagree	Disagree	Strongly agree	Agree	Disagree	Strongly disagree	Disagree	Strongly agree	Disagree	Disagree	Disagree	Strongly agree	Strongly disagree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Strongly agree	Disagree	Agree	Agree	Strongly disagree	Agree	Strongly disagree	Strongly disagree	Strongly disagree	Disagree	Disagree	Agree	Strongly disagree	Strongly disagree	Strongly disagree	Agree	Agree	Strongly disagree	Agree	Strongly agree	Strongly disagree	Strongly disagree	Agree	Disagree	Not at all like me	Not at all like me	Somewhat like me	Not at all like me	Very much like me	Very much like me	Very much like me	Not at all like me	Not at all like me	Not at all like me	definitely not do this	definitely do this	definitely not do this	definitely not do this	4.0	4.0	4.0	4.0	1.0	4.0	2.0	4.0	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	No	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, and I use it	Yes, but I dont use it	No	No	No	Yes, but I dont use it	No	No	7-9 years old	7-9 years old	1	7	7	Never or hardly ever	Every day	Every day	Every day	Every day	Every day	Every day	Every day	Every day	Every day	Almost every day	Every day	Almost every day	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	No	No	No	No	No	No	No	Strongly agree	Strongly disagree	Strongly disagree	Strongly disagree	Strongly disagree	Strongly disagree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	No calculator	7	10	3	StQ Form B	booklet 10	Standard set of booklets	15.75	0.0	Czech Republic: Basic school	-1.68	-1.70	-2.1084	-0.90	25.95	43.33	-0.0784	Czech Republic	Czech Republic	Czech Republic	0.6994	NaN	-1.51	0.20	1.8774	-0.33	NaN	NaN	-1.0202	NaN	NaN	2.0	ISCED 3A, ISCED 4	-0.69	NaN	ISCED 3A, ISCED 4	43.33	-0.30	0.4115	NaN	-2.1575	-1.7471	1.4497	-0.40	-1.4611	Native	NaN	NaN	NaN	-0.67	-0.34	A	ISCED level 2	General	NaN	Czech	NaN	NaN	0.2171	0.34	-1.5329	-0.8805	ISCED 3A, ISCED 4	NaN	-0.9508	General office clerks	Heavy truck and lorry drivers	-0.9492	NaN	13.0	0.4795	Did not repeat a <grade>	-0.06	NaN	2.16	-0.3852	1.0416	1.3823	1.0768	-0.66	Czech	137.0	-0.7749	-1.6104	0.44	-0.7454	-0.8775	-0.2191	-0.0983	0.4532	-0.1562	-0.0960	-0.2558	-0.3007	0.0358	1.0099	-0.1343	446.4948	428.5792	447.2737	456.6210	430.9160	419.2320	425.4635	465.9682	458.9578	447.2737	430.1371	418.4530	462.8525	466.7472	444.9369	411.4426	385.7377	442.6001	441.0422	405.9900	392.7481	380.2851	448.0527	431.6950	409.8847	436.3686	453.5052	455.0631	437.1475	446.4948	460.5157	469.0840	482.3259	448.0527	467.5261	462.0735	455.0631	460.5157	446.4948	451.9473	511.6227	462.7041	427.4185	444.2593	408.1718	517.1018	456.4901	507.7769	489.1272	423.8530	25.4929	12.7464	38.2393	38.2393	38.2393	38.2393	12.7464	38.2393	12.7464	38.2393	12.7464	12.7464	12.7464	12.7464	38.2393	38.2393	12.7464	38.2393	38.2393	12.7464	12.7464	12.7464	38.2393	38.2393	38.2393	38.2393	12.7464	38.2393	12.7464	38.2393	12.7464	12.7464	12.7464	12.7464	38.2393	38.2393	12.7464	38.2393	38.2393	12.7464	12.7464	12.7464	38.2393	38.2393	38.2393	38.2393	12.7464	38.2393	12.7464	38.2393	12.7464	12.7464	12.7464	12.7464	38.2393	38.2393	12.7464	38.2393	38.2393	12.7464	12.7464	12.7464	38.2393	38.2393	38.2393	38.2393	12.7464	38.2393	12.7464	38.2393	12.7464	12.7464	12.7464	12.7464	38.2393	38.2393	12.7464	38.2393	38.2393	12.7464	12.7464	43	2	0.3099	22NOV13
+166716	Spain	7241600	ESP	OECD	Spain	757	21134	9	1.0	7	1996	Male	No	NaN	Yes, once	No, never	NaN	One or two times	None	1.0	Yes	No	Yes	Yes	No	No	<ISCED level 3A>	NaN	NaN	NaN	Yes	Working full-time <for pay>	<ISCED level 3A>	NaN	NaN	Yes	NaN	Working full-time <for pay>	Other country	Other country	Other country	10.0	Language of the test	Yes	NaN	Yes	Yes	No	Yes	NaN	Yes	Yes	Yes	NaN	Yes	NaN	Yes	724001	724001	724002	NaN	Two	Two	One	One	26-100 books	Disagree	Agree	Disagree	Disagree	Agree	Disagree	Agree	Agree	Disagree	Agree	Disagree	Strongly agree	Strongly agree	Agree	Very confident	Confident	Not very confident	Confident	Very confident	Not very confident	Very confident	Not very confident	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Agree	Agree	Agree	Agree	Agree	Disagree	Slightly likely	Slightly likely	Likely	Likely	Likely	Likely	Agree	Disagree	Disagree	Disagree	Agree	Disagree	Agree	Agree	Disagree	Courses after school Math	Major in college Math	Study harder Test Language	Maximum classes Science	Pursuing a career Math	Never or rarely	Never or rarely	Never or rarely	Sometimes	Never or rarely	NaN	Sometimes	Never or rarely	Most important	Improve understanding	in my sleep	everyday life	I do not attend <out-of-school time lessons> i...	I do not attend <out-of-school time lessons> i...	I do not attend <out-of-school time lessons> i...	I do not attend <out-of-school time lessons> i...	2.0	0.0	0.0	0.0	0.0	0.0	Sometimes	Sometimes	Sometimes	Never	Frequently	Rarely	Frequently	Rarely	Frequently	Heard of it once or twice	Heard of it often	Heard of it once or twice	Heard of it a few times	Know it well, understand the concept	Never heard of it	Heard of it often	Heard of it often	Heard of it once or twice	Heard of it often	Heard of it often	Heard of it often	Never heard of it	Heard of it a few times	Heard of it often	Heard of it a few times	60.0	60.0	60.0	4.0	3.0	3.0	NaN	20.0	Frequently	Frequently	Frequently	Frequently	Frequently	Sometimes	Sometimes	Sometimes	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	Somewhat like me	Somewhat like me	Somewhat like me	Somewhat like me	Mostly like me	Somewhat like me	Mostly like me	Mostly like me	Somewhat like me	Somewhat like me	definitely not do this	probably do this	definitely not do this	probably do this	3.0	2.0	3.0	2.0	3.0	3.0	3.0	3.0	Yes, and I use it	Yes, but I dont use it	Yes, but I dont use it	Yes, and I use it	Yes, and I use it	Yes, but I dont use it	No	Yes, but I dont use it	Yes, but I dont use it	Yes, but I dont use it	Yes, but I dont use it	Yes, but I dont use it	Yes, but I dont use it	No	Yes, but I dont use it	Yes, but I dont use it	No	No	10-12 years old	10-12 years old	1	4	6	Almost every day	Almost every day	Once or twice a month	Once or twice a week	Almost every day	Almost every day	Once or twice a week	Once or twice a month	Never or hardly ever	Never or hardly ever	Once or twice a month	Never or hardly ever	Never or hardly ever	Never or hardly ever	Never or hardly ever	Once or twice a month	Never or hardly ever	Never or hardly ever	Never or hardly ever	Once or twice a month	Never or hardly ever	Never or hardly ever	Never or hardly ever	Once or twice a week	Almost every day	Almost every day	No	No	No	No	No	No	No	Agree	Agree	Agree	Agree	Disagree	Agree	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	A Simple calculator	6	7	1	StQ Form A	booklet 7	Standard set of booklets	15.83	-1.0	Spain: Compulsory Secondary Education	NaN	NaN	NaN	NaN	23.57	25.04	NaN	Another country (ESP)	Another country (ESP)	Another country (ESP)	NaN	NaN	1.01	NaN	-0.1819	-0.72	-0.2531	0.7955	0.1524	-0.2608	-1.52	1.0	ISCED 5B	-0.43	NaN	ISCED 5B	25.04	-0.27	-0.9986	NaN	0.7005	-0.5096	-0.5015	-0.40	-0.7538	First-Generation	NaN	NaN	NaN	0.05	-0.34	A	ISCED level 2	General	NaN	Spanish	NaN	240.0	-0.3551	-0.18	0.1775	-0.5641	ISCED 3A, ISCED 4	180.0	NaN	Waiters	Bakers, pastry-cooks and confectionery makers	-0.1465	2.0	13.0	-0.1475	Repeated a <grade>	NaN	180.0	NaN	0.6602	NaN	NaN	NaN	NaN	Spanish	56.0	-0.7749	0.6698	-0.54	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	479.2881	476.9512	499.5404	487.8564	486.2985	527.5822	540.0452	467.6040	519.7928	527.5822	517.4560	506.5509	475.3934	520.5717	556.4029	541.6031	538.4873	493.3089	562.6344	550.9503	520.5717	485.5196	487.8564	509.6666	522.9086	480.0670	447.3516	498.7615	496.4247	490.1932	494.0879	501.0983	530.6979	555.6239	531.4769	506.5509	477.7302	549.3924	550.1714	506.5509	538.8888	516.4344	496.3857	497.9896	502.8013	493.6964	510.4812	475.9791	503.9537	520.7385	3.0499	4.5748	4.5748	4.5748	4.5748	1.5249	1.5249	4.5748	1.5249	1.5249	4.5748	4.5748	1.5249	1.5249	1.5249	1.5249	4.5748	1.5249	4.5748	1.5249	4.5748	4.5748	4.5748	4.5748	4.5748	1.5249	1.5249	4.5748	1.5249	1.5249	4.5748	4.5748	1.5249	1.5249	1.5249	1.5249	4.5748	1.5249	4.5748	1.5249	4.5748	4.5748	4.5748	4.5748	4.5748	1.5249	1.5249	4.5748	1.5249	1.5249	4.5748	4.5748	1.5249	1.5249	1.5249	1.5249	4.5748	1.5249	4.5748	1.5249	4.5748	4.5748	4.5748	4.5748	4.5748	1.5249	1.5249	4.5748	1.5249	1.5249	4.5748	4.5748	1.5249	1.5249	1.5249	1.5249	4.5748	1.5249	4.5748	1.5249	4.5748	68	1	0.0082	22NOV13
+
+Wrangling
+# Spliting the raw data into different smaller dataframes for easier analysis
+# first the main data frame containing the student and schoold information along with the 3 desired variables to be analyysed 
+
+main_df = raw_data.iloc[:, np.r_[6:13, 0,2,3,178,500,540,545, 460,466, 476, 484,
+                                60:63, 65, 74:80, 132:136]].copy()
+# print the summary for the main dataframe
+main_df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 485490 entries, 0 to 485489
+Data columns (total 32 columns):
+ #   Column                                                                                Non-Null Count   Dtype  
+---  ------                                                                                --------------   -----  
+ 0   Student ID                                                                            485490 non-null  int64  
+ 1   International Grade                                                                   485490 non-null  int64  
+ 2   National Study Programme                                                              485438 non-null  float64
+ 3   Birth - Month                                                                         485490 non-null  int64  
+ 4   Birth -Year                                                                           485490 non-null  int64  
+ 5   Gender                                                                                485490 non-null  object 
+ 6   Attend <ISCED 0>                                                                      476166 non-null  object 
+ 7   Country code 3-character                                                              485490 non-null  object 
+ 8   Stratum ID 7-character (cnt + region ID + original stratum ID)                        485490 non-null  object 
+ 9   OECD country                                                                          485490 non-null  object 
+ 10  Class Size - No of Students in <Test Language> Class                                  294163 non-null  float64
+ 11  Plausible value 1 in mathematics                                                      485490 non-null  float64
+ 12  Plausible value 1 in reading                                                          485490 non-null  float64
+ 13  Plausible value 1 in science                                                          485490 non-null  float64
+ 14  Learning time (minutes per week)  - <test language>                                   282866 non-null  float64
+ 15  Learning time (minutes per week)- <Mathematics>                                       283303 non-null  float64
+ 16  Learning time (minutes per week) - <Science>                                          270914 non-null  float64
+ 17  Time of computer use (mins)                                                           297074 non-null  float64
+ 18  How many - cellular phones                                                            477079 non-null  object 
+ 19  How many - televisions                                                                476548 non-null  object 
+ 20  How many - computers                                                                  473459 non-null  object 
+ 21  How many books at home                                                                473765 non-null  object 
+ 22  Subjective Norms -Friends Do Well in Mathematics                                      315860 non-null  object 
+ 23  Subjective Norms -Friends Work Hard on Mathematics                                    315315 non-null  object 
+ 24  Subjective Norms - Friends Enjoy Mathematics Tests                                    314873 non-null  object 
+ 25  Subjective Norms - Parents Believe Studying Mathematics Is Important                  315160 non-null  object 
+ 26  Subjective Norms - Parents Believe Mathematics Is Important for Career                314843 non-null  object 
+ 27  Subjective Norms - Parents Like Mathematics                                           313389 non-null  object 
+ 28  Learning Strategies- Important Parts vs. Existing Knowledge vs. Learn by Heart        309947 non-null  object 
+ 29  Learning Strategies- Improve Understanding vs. New Ways vs. Memory                    309880 non-null  object 
+ 30  Learning Strategies - Other Subjects vs. Learning Goals vs. Rehearse Problems         309272 non-null  object 
+ 31  Learning Strategies - Repeat Examples vs. Everyday Applications vs. More Information  308931 non-null  object 
+dtypes: float64(9), int64(4), object(19)
+memory usage: 118.5+ MB
+# rename columns for easier analysis
+main_df.rename(columns={"Country code 3-character": "country"  ,"Stratum ID 7-character (cnt + region ID + original stratum ID)": "reg_id"\
+                        , "Class Size - No of Students in <Test Language> Class": "class_size"\
+                       ,"Plausible value 1 in mathematics": "pv1_math"\
+                       ,"Plausible value 1 in reading": 'pv1_reading'\
+                       ,"Plausible value 1 in science": 'pv1_science'\
+              ,"Learning time (minutes per week)  - <test language>": "learn_time_lang"\
+                        ,"Learning time (minutes per week)- <Mathematics>":"learn_time_math"
+              ,"Learning time (minutes per week) - <Science>": "learn_time_science"}, inplace=True);
+# extract column name list
+col_names = main_df.columns.tolist()
+
+#print columns with enumerate to have an index for each variable
+print(list(enumerate(col_names)))
+[(0, 'Student ID'), (1, 'International Grade'), (2, 'National Study Programme'), (3, 'Birth - Month'), (4, 'Birth -Year'), (5, 'Gender'), (6, 'Attend <ISCED 0>'), (7, 'country'), (8, 'reg_id'), (9, 'OECD country'), (10, 'class_size'), (11, 'pv1_math'), (12, 'pv1_reading'), (13, 'pv1_science'), (14, 'learn_time_lang'), (15, 'learn_time_math'), (16, 'learn_time_science'), (17, 'Time of computer use (mins)'), (18, 'How many - cellular phones'), (19, 'How many - televisions'), (20, 'How many - computers'), (21, 'How many books at home'), (22, 'Subjective Norms -Friends Do Well in Mathematics'), (23, 'Subjective Norms -Friends Work Hard on Mathematics'), (24, 'Subjective Norms - Friends Enjoy Mathematics Tests'), (25, 'Subjective Norms - Parents Believe Studying Mathematics Is Important'), (26, 'Subjective Norms - Parents Believe Mathematics Is Important for Career'), (27, 'Subjective Norms - Parents Like Mathematics'), (28, 'Learning Strategies- Important Parts vs. Existing Knowledge vs. Learn by Heart'), (29, 'Learning Strategies- Improve Understanding vs. New Ways vs. Memory'), (30, 'Learning Strategies - Other Subjects vs. Learning Goals vs. Rehearse Problems'), (31, 'Learning Strategies - Repeat Examples vs. Everyday Applications vs. More Information')]
+# print summart statistics for main dataframe
+main_df.head(2)
+x	Student ID	International Grade	National Study Programme	Birth - Month	Birth -Year	Gender	Attend <ISCED 0>	country	reg_id	OECD country	class_size	pv1_math	pv1_reading	pv1_science	learn_time_lang	learn_time_math	learn_time_science	Time of computer use (mins)	How many - cellular phones	How many - televisions	How many - computers	How many books at home	Subjective Norms -Friends Do Well in Mathematics	Subjective Norms -Friends Work Hard on Mathematics	Subjective Norms - Friends Enjoy Mathematics Tests	Subjective Norms - Parents Believe Studying Mathematics Is Important	Subjective Norms - Parents Believe Mathematics Is Important for Career	Subjective Norms - Parents Like Mathematics	Learning Strategies- Important Parts vs. Existing Knowledge vs. Learn by Heart	Learning Strategies- Improve Understanding vs. New Ways vs. Memory	Learning Strategies - Other Subjects vs. Learning Goals vs. Rehearse Problems	Learning Strategies - Repeat Examples vs. Everyday Applications vs. More Information
+0	1	10	1.0	2	1996	Female	No	Albania	ALB	Non-OECD	NaN	406.8469	249.5762	341.7009	NaN	NaN	NaN	NaN	Two	One	None	0-10 books	Disagree	Agree	Disagree	Agree	Agree	Agree	NaN	NaN	NaN	NaN
+1	2	10	1.0	2	1996	Female	Yes, for more than one year	Albania	ALB	Non-OECD	30.0	486.1427	406.2936	548.9929	315.0	270.0	90.0	NaN	Three or more	Three or more	Three or more	201-500 books	Strongly agree	Strongly agree	Disagree	Agree	Disagree	Agree	relating to known	Improve understanding	in my sleep	Repeat examples
+# print summart statistics for main dataframe
+main_df.describe()
+x	Student ID	International Grade	National Study Programme	Birth - Month	Birth -Year	class_size	pv1_math	pv1_reading	pv1_science	learn_time_lang	learn_time_math	learn_time_science	Time of computer use (mins)
+count	485490.000000	485490.000000	485438.000000	485490.000000	485490.000000	294163.000000	485490.000000	485490.000000	485490.000000	282866.000000	283303.000000	270914.000000	297074.000000
+mean	6134.066201	9.813323	2.579260	6.558512	1996.070061	26.017759	469.621653	472.004640	475.769824	219.276636	226.007056	211.122460	50.895996
+std	6733.144944	3.734726	2.694013	3.705244	0.255250	9.223134	103.265391	102.505523	101.464426	97.997730	97.448421	131.368322	40.987895
+min	1.000000	7.000000	1.000000	1.000000	1996.000000	0.000000	19.792800	0.083400	2.648300	0.000000	0.000000	0.000000	0.000000
+25%	1811.000000	9.000000	1.000000	4.000000	1996.000000	20.000000	395.318600	403.600700	404.457300	165.000000	180.000000	120.000000	19.000000
+50%	3740.000000	10.000000	1.000000	7.000000	1996.000000	25.000000	466.201900	475.455000	475.699400	200.000000	220.000000	180.000000	39.000000
+75%	7456.000000	10.000000	3.000000	9.000000	1996.000000	30.000000	541.057800	544.502500	547.780700	250.000000	250.000000	270.000000	71.000000
+max	33806.000000	96.000000	25.000000	99.000000	1997.000000	200.000000	962.229300	904.802600	903.338300	2400.000000	3000.000000	2975.000000	206.000000
+seems no outliers or annmolies are present, which will be verified visually in the exploration section
+# checking for invalid country name and codes
+
+list_name = [i.name for i in list(pycountry.countries)]
+list_alpha_3 = [i.alpha_3 for i in list(pycountry.countries)]    
+
+def country_flag(main_df):
+    if (main_df['country'] in list_name):
+        return pycountry.countries.get(name=main_df['country']).alpha_3
+    else:
+        return 'Invalid Code'
+
+main_df['country_code']=main_df.apply(country_flag, axis = 1)
+# change the values of invalid codes
+code_dict = {"Czech Republic": "CZE", "Korea":"KOR", "Slovak Republic":"SVK", "United States of America":"USA", "Vietnam":"VNM"}
+
+main_df.loc[main_df.country == "Czech Republic", "country_code"] = "CZE"
+main_df.loc[main_df.country == "Korea", "country_code"] = "KOR"
+main_df.loc[main_df.country == "Slovak Republic", "country_code"] = "SVK"
+main_df.loc[main_df.country == "United States of America", "country_code"] = "USA"
+main_df.loc[main_df.country == "Vietnam", "country_code"] = "VNM"
+main_df.loc[main_df.country == "China", "country_code"] = "CHN"
+main_df.loc[main_df.country == "Russian Federation", "country_code"] = "RUS"
+main_df.loc[main_df.country == "Macao", "country_code"] = "MAC"
+main_df.loc[main_df.country == "Hong Kong", "country_code"] = "HKG"
+# define a function to rename both country and its 3 charachter code
+def rename_country(df, series, name, reg_id, country_code):
+    """
+    Rename a value in a series
+    
+    Parameters:
+    df: dataframe
+    series : name of the variable
+    name :desired name
+    reg_id : Region name to be replaced
+    country_code: country code to replace the region name
+    
+    Returns:
+    dataframe with correct country name and region name replaced with desired country code
+    """
+    df[df["country"] ==series] =df.query("country ==@series").replace(series,name)
+    df.query("country ==@name")[reg_id].replace(reg_id, country_code)
+usa_States = ['Florida (USA)', 'Connecticut (USA)', 'Massachusetts (USA)']
+for states in usa_States:
+    try:
+        rename_country(main_df,states, 'United States of America', 'reg_id','USA');
+    except:
+        pass
+# correct some of the invalid names and country codes
+rename_country(main_df,'Massachusetts (USA)', 'United States of America', 'reg_id','USA');
+# correct some of the invalid names and country codes
+rename_country(main_df,'Hong Kong-China', 'Hong Kong', 'reg_id','HKG');
+# correct some of the invalid names and country codes
+rename_country(main_df,'Macao-China', 'Macao', 'reg_id','MAC');
+# correct some of the invalid names and country codes
+rename_country(main_df,'China-Shanghai', 'China', 'reg_id','CHN');
+# correct some of the invalid names and country codes
+rename_country(main_df,'Chinese Taipei', 'China', 'reg_id','CHN')
+# correct some of the invalid names and country codes
+rename_country(main_df,'Perm(Russian Federation)', 'Russian Federation', 'reg_id','RUS')
+# create a function to order the ordinal categorical  featueres
+def reorder_ordinal(categories_order, dataframe,series):
+    """
+    Re-order Ordinal Variables
+    categories_order : list of ordered variables
+    dataframe: dataframe to be used
+     series: the series whose order will be changed   
+    """
+    ordered_cat = pd.api.types.CategoricalDtype(ordered = True, categories = categories_order)
+    dataframe[series] = dataframe[series].astype(ordered_cat)
+# re-order subjective norms for better visualization
+norms_list=main_df.columns.tolist()[22:28]
+norm_order= ["nan",'Strongly disagree', 'Disagree', 'Agree', 'Strongly agree']
+#use function to re-order all subjective norms featuers 
+for norm in norms_list:
+    reorder_ordinal(norm_order, main_df, norm)
+main_df.head(2)
+x	Student ID	International Grade	National Study Programme	Birth - Month	Birth -Year	Gender	Attend <ISCED 0>	country	reg_id	OECD country	class_size	pv1_math	pv1_reading	pv1_science	learn_time_lang	learn_time_math	learn_time_science	Time of computer use (mins)	How many - cellular phones	How many - televisions	How many - computers	How many books at home	Subjective Norms -Friends Do Well in Mathematics	Subjective Norms -Friends Work Hard on Mathematics	Subjective Norms - Friends Enjoy Mathematics Tests	Subjective Norms - Parents Believe Studying Mathematics Is Important	Subjective Norms - Parents Believe Mathematics Is Important for Career	Subjective Norms - Parents Like Mathematics	Learning Strategies- Important Parts vs. Existing Knowledge vs. Learn by Heart	Learning Strategies- Improve Understanding vs. New Ways vs. Memory	Learning Strategies - Other Subjects vs. Learning Goals vs. Rehearse Problems	Learning Strategies - Repeat Examples vs. Everyday Applications vs. More Information	country_code
+0	1	10	1.0	2	1996	Female	No	Albania	ALB	Non-OECD	NaN	406.8469	249.5762	341.7009	NaN	NaN	NaN	NaN	Two	One	None	0-10 books	Disagree	Agree	Disagree	Agree	Agree	Agree	NaN	NaN	NaN	NaN	ALB
+1	2	10	1.0	2	1996	Female	Yes, for more than one year	Albania	ALB	Non-OECD	30.0	486.1427	406.2936	548.9929	315.0	270.0	90.0	NaN	Three or more	Three or more	Three or more	201-500 books	Strongly agree	Strongly agree	Disagree	Agree	Disagree	Agree	relating to known	Improve understanding	in my sleep	Repeat examples	ALB
+# re-order how many ict devices are owned
+ict_list=['nan','None', 'One', 'Two', 'Three or more']
+ict_columns = main_df.columns.tolist()[18:21]
+for series in ict_columns:
+    reorder_ordinal(ict_list, main_df, series)
+# re-order how many books variable
+books_order= ["nan",'0-10 books ', '11-25 books' , '26-100 books ','101-200 books '
+              '201-500 books ', 'More than 500 books' ]
+reorder_ordinal(books_order, main_df,'How many books at home')
+# change the values of invalid codes
+code_dict = {"Czech Republic": "CZE", "Korea":"KOR", "Slovak Republic":"SVK", "United States of America":"USA", "Vietnam":"VNM"}
+
+main_df.loc[main_df.country == "Czech Republic", "country_code"] = "CZE"
+main_df.loc[main_df.country == "Korea", "country_code"] = "KOR"
+main_df.loc[main_df.country == "Slovak Republic", "country_code"] = "SVK"
+main_df.loc[main_df.country == "United States of America", "country_code"] = "USA"
+main_df.loc[main_df.country == "Vietnam", "country_code"] = "VNM"
+main_df.loc[main_df.country == "China", "country_code"] = "CHN"
+main_df.loc[main_df.country == "Russian Federation", "country_code"] = "RUS"
+main_df.loc[main_df.country == "Macao", "country_code"] = "MAC"
+main_df.loc[main_df.country == "Hong Kong", "country_code"] = "HKG"
+# score per country
+main_group_country = main_df.groupby(['country', 'country_code']).agg({'pv1_math': ['mean']\
+                                                                  ,"pv1_reading": ['mean']\
+                                                                   ,"pv1_science":['mean']\
+                                                                      ,'class_size':'mean', 'learn_time_lang':"mean"\
+                                                                      ,'learn_time_math':"mean"\
+                                                                      ,'learn_time_science':"mean"\
+                                                                      ,'Time of computer use (mins)':'mean'})
+# to unstack the grouped  variables
+main_group_country.columns=main_group_country.columns.map('_'.join)
+# to convert it as a dataframe for easier manipulation
+country_mean_score = main_group_country.reset_index()
+# view the head of datafrane
+country_mean_score
+country	country_code	pv1_math_mean	pv1_reading_mean	pv1_science_mean	class_size_mean	learn_time_lang_mean	learn_time_math_mean	learn_time_science_mean	Time of computer use (mins)_mean
+0	Albania	ALB	395.296185	396.424292	399.068070	26.219784	175.873077	171.165197	149.358542	NaN
+1	Argentina	ARG	395.402241	403.511227	410.369278	28.236729	266.146698	278.499787	222.214189	NaN
+2	Australia	AUS	492.842855	500.845303	511.250599	22.109969	233.019440	235.801302	227.791550	66.966664
+3	Austria	AUT	507.711753	490.918021	507.213082	20.804536	143.464957	155.840096	199.740586	48.257309
+4	Belgium	BEL	519.868902	512.319008	510.475079	18.671750	217.177139	216.420305	190.755675	49.932816
+...	...	...	...	...	...	...	...	...	...	...
+58	United Arab Emirates	ARE	431.373626	437.239951	445.089129	23.881731	268.238778	296.731890	297.135956	NaN
+59	United Kingdom	GBR	489.645545	498.292310	510.043154	24.037055	230.741038	230.146636	284.280249	NaN
+60	United States of America	USA	485.632260	502.823313	501.420740	23.120396	257.804277	257.119482	256.431326	NaN
+61	Uruguay	URY	410.957687	413.573968	418.086895	25.096517	139.161391	156.538776	154.197560	56.757315
+62	Vietnam	VNM	510.589967	508.259166	528.157948	40.996757	193.068268	226.802486	237.755485	NaN
+63 rows × 10 columns
+
+#Check  for country names are correct
+main_df.country.unique()
+array(['Albania', 'United Arab Emirates', 'Argentina', 'Australia',
+       'Austria', 'Belgium', 'Bulgaria', 'Brazil', 'Canada',
+       'Switzerland', 'Chile', 'Colombia', 'Costa Rica', 'Czech Republic',
+       'Germany', 'Denmark', 'Spain', 'Estonia', 'Finland', 'France',
+       'United Kingdom', 'Greece', 'Hong Kong', 'Croatia', 'Hungary',
+       'Indonesia', 'Ireland', 'Iceland', 'Israel', 'Italy', 'Jordan',
+       'Japan', 'Kazakhstan', 'Korea', 'Liechtenstein', 'Lithuania',
+       'Luxembourg', 'Latvia', 'Macao', 'Mexico', 'Montenegro',
+       'Malaysia', 'Netherlands', 'Norway', 'New Zealand', 'Peru',
+       'Poland', 'Portugal', 'Qatar', 'China', 'Russian Federation',
+       'United States of America', 'Romania', 'Singapore', 'Serbia',
+       'Slovak Republic', 'Slovenia', 'Sweden', 'Thailand', 'Tunisia',
+       'Turkey', 'Uruguay', 'Vietnam'], dtype=object)
+# check if there are any Invalid Codes
+country_mean_score.query("country_code=='Invalid Code'")
+country	country_code	pv1_math_mean	pv1_reading_mean	pv1_science_mean	class_size_mean	learn_time_lang_mean	learn_time_math_mean	learn_time_science_mean	Time of computer use (mins)_mean
+# change the structure of the data frame for visualization needs
+melted_main_group_country = country_mean_score.melt(['country', 'country_code'], var_name='score', value_name='vals')
+#visualy inspect the data frame
+melted_main_group_country
+country	country_code	score	vals
+0	Albania	ALB	pv1_math_mean	395.296185
+1	Argentina	ARG	pv1_math_mean	395.402241
+2	Australia	AUS	pv1_math_mean	492.842855
+3	Austria	AUT	pv1_math_mean	507.711753
+4	Belgium	BEL	pv1_math_mean	519.868902
+...	...	...	...	...
+499	United Arab Emirates	ARE	Time of computer use (mins)_mean	NaN
+500	United Kingdom	GBR	Time of computer use (mins)_mean	NaN
+501	United States of America	USA	Time of computer use (mins)_mean	NaN
+502	Uruguay	URY	Time of computer use (mins)_mean	56.757315
+503	Vietnam	VNM	Time of computer use (mins)_mean	NaN
+504 rows × 4 columns
+
+Seems no erronus observation is noticed, so we can head over to the univariate analysis
+
+exploratory visualization
+Univariate Exploration
+
+# plotting the 3 Variables of interest
+# the math score distribution
+main_interest = ['pv1_math','pv1_reading' ,'pv1_science']
+plt.figure(figsize=(10,6))
+for series in main_interest:
+    main_df[series].plot(kind="hist", alpha=0.3, bins=20);       
+plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
+
+plt.show()
+
+from the graph above it shows that the scores of interest are normally distributed, without many outliers, also the distribution mean is in the following ranges:
+Pv1 for math : 425
+Pv1 for reading is around 550
+Pv1 for science : 425
+Now we explore the other numerical features{ Time spent studying and time spent using the PC}
+# plotting the some of the variables that might affect the pv scores
+main_factors = ['learn_time_lang','learn_time_math', 'learn_time_science',	'Time of computer use (mins)']
+
+fig = plt.figure()
+fig.set_size_inches([20,20])
+for c,num in zip(main_factors, np.arange(1,5)):
+    ax = fig.add_subplot(5,5,num)
+    main_df[c].plot(kind="hist", title=c, ax=ax)
+plt.tight_layout()
+plt.show()
+
+Discuss the distribution(s) of your variable(s) of interest. Were there any unusual points? Did you need to perform any transformations?
+The graphs seems all are right skewed dstributed, with math and science learning time seems very closely related, while for reading languages, students seem to spent more time compared to math and science.
+
+while time spent using the computer seems has more wider variations, could it have an effect on the scores ?
+Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+Right skewed dstributedm without any noticable unusual distributions, for these particular features, I haven't introduced any changed or wrangling techniques.
+
+Explore the Gender Distribution
+# inspecting the gender count
+plt.figure(figsize=(8,4))
+base_color = sns.color_palette()[0]
+sns.countplot(data = main_df, x = 'Gender', color = base_color)
+plt.xticks(rotation = 0);
+
+We notice that the Gender is almost equally distributed, so this will help in giving us a better understanding if there is a relationship between Gender and the 3 Scores without any bias in the upcoming bivariate visualization section.
+Explore the top 10 scoring countries
+# top scoring countries
+mean_score = ['pv1_math_mean', 'pv1_science_mean', 'pv1_reading_mean']
+
+for mean_score in mean_score:
+    sns.catplot(y='country', x='vals',\
+              data=melted_main_group_country.query('score== @mean_score') \
+           , kind='bar'\
+           ,order=melted_main_group_country.\
+                query('score== @mean_score').sort_values(by='vals', ascending=False).iloc[:10]['country'],
+               color="c")
+
+
+
+We notice that there are several countries which shows in the top 10 countries repeatedly in the 3 scores, interestingly Asian countries have a strong presence in all 3 scores, they must be doing something different, to have such consisetant high scores.
+We need to investigate Asian countries behaviour vs other countries
+Bivariate Exploration
+In this section, investigate relationships between pairs of variables in your data. Make sure the variables that you cover here have been introduced in some fashion in the previous section (univariate exploration).
+
+# investigate  Score  & class size vs Scores.
+corr = country_mean_score.corr()
+
+plt.figure(figsize = [8, 5])
+sns.heatmap(corr, annot = True, fmt = '.3f',   cmap = 'vlag_r', center = 0);
+
+We Notice that the Class size have weak negative correlation, with the score, to what extent will it affect the scores? we will find out in scores by country later on.
+main_score_by_gender = main_df[['Gender', 'pv1_math', "pv1_reading", "pv1_science"]]
+
+scores =['pv1_math', "pv1_reading", "pv1_science"]
+for score in scores:
+         sns.catplot(x="Gender", y=score, kind="box", dodge=False, data=main_score_by_gender);
+
+
+
+from the above graph, we notice that the distribution of the scores are very close for the reading and math scores, with males always having greater range of values, but both females and males have around the same mean of 500, while for the reading scores we observe that on average female have higher scores than males, which we will investigate further.
+otherwise, no large differences between genders
+learn_time_by_gender = main_df[['Gender', 'learn_time_math', "learn_time_lang", "learn_time_science",  
+                                'Time of computer use (mins)']]
+
+scores =['learn_time_math', "learn_time_lang", "learn_time_science",  'Time of computer use (mins)']
+for score in scores:
+         sns.catplot(x="Gender", y=score, kind="violin", dodge=False, data=learn_time_by_gender);
+
+
+
+
+we Observe some variances between time spent studying math as distribution of males have wider range, vicer versa for females their distribution has wider range for time spent studying a language and science, with males having a slight more time spent on using the computer for an average between booth Genders.
+Multivariate Exploration
+Create plots of three or more variables to investigate your data even further. Make sure that your investigations are justified, and follow from your work in the previous sections.
+
+# Does gender has effect on score
+plt.figure(figsize=(10,6))
+sns.pairplot(main_score_by_gender, hue='Gender');
+<Figure size 720x432 with 0 Axes>
+
+# plot the distribution of score around the world
+
+def score_per_country(dataframe, locations, variable,country, bar_title, title_name):
+    fig = go.Figure(data=go.Choropleth(
+    locations = dataframe[locations],
+    z = dataframe[variable],
+    text = dataframe[country].astype(str),
+    colorscale = 'Blues',
+    autocolorscale=False,
+    reversescale=False,
+    marker_line_color='darkgray',
+    marker_line_width=0.5,
+    colorbar_tickprefix = '#',
+    colorbar_title = variable,
+    ))
+
+    fig.update_layout(
+    title_text= title_name+ ' 2012 score',
+    geo=dict(
+        showframe=False,
+        showcoastlines=False,
+        projection_type='equirectangular'
+    ),
+    annotations = [dict(
+        x=0.55,
+        y=0.1,
+        xref='paper',
+        yref='paper',
+        text='Source: <a href="http://www.oecd.org/pisa/keyfindings/pisa-2012-results.html">\
+           PISA 2012</a>',
+        showarrow = False
+    )]
+    )
+
+    fig.show()
+the reason the below visualization is in the multivariate section, is I intend to compare score vs it's relevant study time + class size
+# choropleth visualization for easier grasp of scores.
+score_mean = ['pv1_math_mean',  "learn_time_math_mean", 'pv1_reading_mean', "learn_time_lang_mean"\
+              ,'pv1_science_mean'\
+                                         ,"learn_time_science_mean","class_size_mean" ]
+for score in score_mean:
+    score_per_country(country_mean_score, 'country_code', score,'country',score, score)
+#400
+#450
+#500
+#550
+pv1_math_mean
+pv1_math_mean 2012 score
+Source:            PISA 2012
+#150
+#200
+#250
+#300
+#350
+learn_time_math_mean
+learn_time_math_mean 2012 score
+Source:            PISA 2012
+#400
+#420
+#440
+#460
+#480
+#500
+#520
+#540
+pv1_reading_mean
+pv1_reading_mean 2012 score
+Source:            PISA 2012
+#150
+#200
+#250
+#300
+#350
+learn_time_lang_mean
+learn_time_lang_mean 2012 score
+Source:            PISA 2012
+#400
+#450
+#500
+#550
+pv1_science_mean
+pv1_science_mean 2012 score
+Source:            PISA 2012
+#150
+#200
+#250
+#300
+learn_time_science_mean
+learn_time_science_mean 2012 score
+Source:            PISA 2012
+#20
+#25
+#30
+#35
+#40
+class_size_mean
+class_size_mean 2012 score
+Source:            PISA 2012
+Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+We Observe that some countries might have longer average study times yet other countries have better scores, this is constantly occurring with China for example, also class size should have played some rule in China having lower scores compared to other countries yet that didn't happen
+
+Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+Some Countries didn't show up on the map, so we had to verify the coutry names and codes to reflect all countries that are in the survey are correctly mapped.
+
+Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+Canada, USA and Russia among the top countries that students dedicate long study hours especially in science.
+
+We Will now investigate what drives the Chinese students to score more, compared to other students who spent more time and have better student to teacher ratio.
+
+Why China has better scores ?
+# compare china vs other coutries having on average median scores
+country_mean_score.median()
+pv1_math_mean                       485.632260
+pv1_reading_mean                    485.592069
+pv1_science_mean                    491.698981
+class_size_mean                      24.066823
+learn_time_lang_mean                203.366254
+learn_time_math_mean                212.221565
+learn_time_science_mean             196.941037
+Time of computer use (mins)_mean     54.317095
+dtype: float64
+country_median_math= country_mean_score[country_mean_score["pv1_math_mean"].between(480,486)
+]
+middle_score_countries= country_median_math.country.values.tolist()
+middle_score_countries
+['Hungary',
+ 'Portugal',
+ 'Russian Federation',
+ 'Slovak Republic',
+ 'Slovenia',
+ 'United States of America']
+# create a  subset dataframe for  country= china, and honk kong from main_df
+china_df= main_df.query('country==["China", "Hong Kong","Macao"]')
+# create new data frame for countries with middle mean score for math
+mid_score_countries =main_df.query('country==["Slovenia", "Portugal", "United States of America"]')
+# function to organise and  visualize the two df
+
+def visualize(dataframe1, dataframe2, series):
+    dff=dataframe1.groupby(series).agg({'pv1_math':['mean','count'],
+                                       'pv1_reading':['mean'],
+                                        'pv1_science':['mean'] }).reset_index()
+    dff.columns=[series,'pv1_math_mean',
+                 'count','pv1_reading_mean', 'pv1_science_mean']
+    dff2=dataframe2.groupby(series).agg({'pv1_math':['mean','count'],
+                                       'pv1_reading':['mean'],
+                                        'pv1_science':['mean'] }).reset_index()
+    dff2.columns=[series,'pv1_math_mean', 'count','pv1_reading_mean',
+                  'pv1_science_mean']
+    
+    fig = go.Figure(data=[
+    go.Bar(name='China', x=dff[series], y=dff['count'], text=dff['pv1_math_mean']
+           ),
+    go.Bar(name='Others', x=dff2[series], y=dff2['count'], text=dff2['pv1_math_mean']
+          )
+    ])
+    # Change the bar mode
+    fig.update_layout(barmode='group',title_text= series+" against scores")
+    fig.show()
+    
+
+for series in main_df.columns.tolist()[18:]:
+    visualize(china_df, mid_score_countries, series)
+nan
+None
+One
+Two
+Three or more
+0
+5k
+10k
+15k
+20k
+How many - cellular phones against scores
+nan
+None
+One
+Two
+Three or more
+0
+2k
+4k
+6k
+8k
+10k
+12k
+14k
+How many - televisions against scores
+nan
+None
+One
+Two
+Three or more
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+8000
+9000
+How many - computers against scores
+nan
+0-10 books 
+11-25 books
+26-100 books 
+101-200 books 201-500 books 
+More than 500 books
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+How many books at home against scores
+nan
+Strongly disagree
+Disagree
+Agree
+Strongly agree
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+8000
+Subjective Norms -Friends Do Well in Mathematics against scores
+nan
+Strongly disagree
+Disagree
+Agree
+Strongly agree
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+Subjective Norms -Friends Work Hard on Mathematics against scores
+nan
+Strongly disagree
+Disagree
+Agree
+Strongly agree
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+8000
+Subjective Norms - Friends Enjoy Mathematics Tests against scores
+nan
+Strongly disagree
+Disagree
+Agree
+Strongly agree
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+8000
+Subjective Norms - Parents Believe Studying Mathematics Is Important against scores
+nan
+Strongly disagree
+Disagree
+Agree
+Strongly agree
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+Subjective Norms - Parents Believe Mathematics Is Important for Career against scores
+nan
+Strongly disagree
+Disagree
+Agree
+Strongly agree
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+Subjective Norms - Parents Like Mathematics against scores
+Most important
+by heart
+relating to known
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+Learning Strategies- Important Parts vs. Existing Knowledge vs. Learn by Heart against scores
+Improve understanding
+check memory
+new ways
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+8000
+Learning Strategies- Improve Understanding vs. New Ways vs. Memory against scores
+Relating to other subjects
+in my sleep
+learning goals
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+8000
+Learning Strategies - Other Subjects vs. Learning Goals vs. Rehearse Problems against scores
+Repeat examples
+everyday life
+more information
+0
+1000
+2000
+3000
+4000
+5000
+6000
+7000
+Learning Strategies - Repeat Examples vs. Everyday Applications vs. More Information against scores
+CHN
+HKG
+MAC
+PRT
+SVN
+USA
+0
+2k
+4k
+6k
+8k
+10k
+country_code against scores
+Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+Interstingly most of the features have same behavior and patterns between chinese students and the other 3 countries, whether it be the possession of books or ICT devices, or even subjective norms of the students, nothing stands out for the chinese students answer for these features.
+
+Of the features you investigated, were there any unusual distributions?
+The Features that don't follow the same pattern as other countries, are the subjective norms regarding parents relationship with math, as it seems Chinese parents compared to parents from the oher countries are less likely to put more emphasize for learning math, or it could be that non chinese parents put social pressure on their children to learn math, that's why these student perform lower than Chinese students.
+
+Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+I have chosen 3 countries having same amount of students particpiating in the survey, to ward off any bias as possible.
+
+Once you're ready to finish your presentation, check your output by using nbconvert to export the notebook and set up a server for the slides. From the terminal or command line, use the following expression:
+
+jupyter nbconvert communicate_data_project_Part 2.ipynb --to slides --post serve --template output_toggle
+
+This should open a tab in your web browser where you can scroll through your presentation. Sub-slides can be accessed by pressing 'down' when viewing its parent slide. Make sure you remove all of the quote-formatted guide notes like this one before you finish your presentation
+
+I haven't removed this note, because it didn't work with me, I have tried to trouble shoot it but still not working, there is another alternative called RISE I have tried but it didn't give the same interactivity(hiding and unhiding the subplot slides) as desired
+References
+csv encoding: https://stackoverflow.com/questions/18171739/unicodedecodeerror-when-reading-csv-file-in-pandas-with-python
+
+reading large csv files : https://stackoverflow.com/questions/17444679/reading-a-huge-csv-file
+
+choosing non-adjacent columns : https://stackoverflow.com/questions/53052914/selecting-non-adjacent-columns-by-column-number->pandas plt legend location : https://stackoverflow.com/questions/4700614/how-to-put-the-legend-out-of-the-plot#:~:text=To%20place%20the%20legend%20outside,left%20corner%20of%20the%20legend.&text=However%2C%20a%20more%20versatile%20approach,placed%2C%20using%20the%20bbox_to_anchor%20argument.
+
+unstacking pandas data frame: https://cmdlinetips.com/2020/05/fun-with-pandas-groupby-aggregate-multi-index-and-unstack/#:~:text=Pandas%20unstack%20function%20to%20get%20data%20in%20wide%20form&text=When%20you%20groupby%20multiple%20variables,rows%20in%20the%20wide%20form.&text=If%20we%20want%20wide%20form,name%20to%20unstack()%20function. melting a df : https://stackoverflow.com/questions/44941082/plot-multiple-columns-of-pandas-dataframe-using-seaborn
+ordering top 10 in a plot : https://stackoverflow.com/questions/32891211/limit-the-number-of-groups-shown-in-seaborn-countplot
+using a variable in query function : https://stackoverflow.com/questions/57297077/use-variable-in-pandas-query
+correcting the country code : https://stackoverflow.com/questions/53923433/how-to-get-country-name-from-country-abbreviation-in-python-with-mix-of-alpha-2
+
+changing pandas value based on condition: https://www.kite.com/python/answers/how-to-change-values-in-a-pandas-dataframe-column-based-on-a-condition-in-python#:~:text=loc%20to%20change%20values%20in,for%20which%20condition%20is%20True%20.
+
+https://stackoverflow.com/questions/51416909/how-to-increase-the-size-of-jupyter-notebook-plot/51417061
+
+Plotly Bar chart : https://plotly.com/python/bar-charts/
